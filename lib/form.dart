@@ -30,7 +30,7 @@ class _FormInsertState extends State<FormInsert>
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          TabCustom(pc: pc),
+          Padding(padding: EdgeInsets.all(18.0), child: TabCustom(pc: pc)),
           Expanded(
             child: PageView.builder(
                 itemCount: 3,
@@ -59,26 +59,32 @@ class _TabCustomState extends State<TabCustom> {
   TabController pc;
 
   int selectedIndex = 0;
-
-  double padding = 18.0;
+  var selectedsizewidth = 0.0;
 
   @override
   void initState() {
     pc = this.widget.pc;
+
     super.initState();
+
+    Future.delayed(Duration(milliseconds: 100), () {
+      RenderBox a = context.findRenderObject();
+      print(a.size.width / 3);
+      setState(() {
+        selectedsizewidth = a.size.width / 3;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    var selectedsizewidth =
-        (MediaQuery.of(context).size.width - padding * 2) * (1 / 3);
     return SafeArea(
       child: Column(
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
             height: 70,
-            padding: EdgeInsets.symmetric(horizontal: padding, vertical: 12.0),
+            padding: EdgeInsets.symmetric(vertical: 12.0),
             child: Stack(
               children: [
                 Container(
@@ -98,7 +104,9 @@ class _TabCustomState extends State<TabCustom> {
                       : selectedIndex == 1
                           ? selectedsizewidth
                           : selectedsizewidth * 2,
-                  child: Container(
+                  child: AnimatedContainer(
+                      curve: Curves.ease,
+                      duration: Duration(milliseconds: 500),
                       width: selectedsizewidth,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
@@ -162,6 +170,12 @@ class _TabCustomState extends State<TabCustom> {
         ],
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
   }
 }
 

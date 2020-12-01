@@ -95,7 +95,7 @@ class Mains1 extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-        transformAlignment: Alignment.topCenter,
+        // transformAlignment: Alignment.topCenter,
         // transform: Matrix4.identity()..scale(0.9, 0.9),
         alignment: Alignment.bottomCenter,
         child: PageView.builder(
@@ -171,7 +171,7 @@ class _PageAState extends State<PageA> {
       margin: margin,
       duration: Duration(milliseconds: 100),
       alignment: Alignment.bottomCenter,
-      transformAlignment: Alignment.bottomCenter,
+      // transformAlignment: Alignment.bottomCenter,
       transform: Matrix4.identity()
         ..rotateZ(-22 /
             7 *
@@ -242,7 +242,7 @@ class _PageBState extends State<PageB> {
       margin: margin,
       duration: Duration(milliseconds: 100),
       alignment: Alignment.bottomCenter,
-      transformAlignment: Alignment.bottomCenter,
+      // transformAlignment: Alignment.bottomCenter,
       transform: Matrix4.identity()..rotateZ(maxoffset - zVal),
       child: Center(
         child: Text('Page B'),
