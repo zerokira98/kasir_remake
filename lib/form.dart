@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class FormInsert extends StatefulWidget {
@@ -6,21 +7,11 @@ class FormInsert extends StatefulWidget {
   _FormInsertState createState() => _FormInsertState();
 }
 
-class _FormInsertState extends State<FormInsert>
-    with SingleTickerProviderStateMixin {
-  TabController pc;
-  PageController pageC;
+class _FormInsertState extends State<FormInsert> {
+  PageController pageC = PageController(initialPage: 0);
   @override
   initState() {
     super.initState();
-    pc = TabController(length: 3, vsync: this);
-    pageC = PageController(initialPage: 0);
-    pc.addListener(() {
-      pageC.animateToPage(pc.index,
-          curve: Curves.ease, duration: Duration(milliseconds: 500));
-      // setState(() {});
-      print(pc.index);
-    });
   }
 
   @override
@@ -30,10 +21,15 @@ class _FormInsertState extends State<FormInsert>
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Padding(padding: EdgeInsets.all(18.0), child: TabCustom(pc: pc)),
+          Padding(
+              padding: EdgeInsets.all(18.0),
+              child: TabCustom(
+                  pageController: pageC,
+                  length: 1,
+                  items: ['Main menu', 'Profile', 'DM'])),
           Expanded(
             child: PageView.builder(
-                itemCount: 3,
+                itemCount: 5,
                 controller: pageC,
                 itemBuilder: (context, i) {
                   if (i == 0) return RealForm();
@@ -49,29 +45,40 @@ class _FormInsertState extends State<FormInsert>
 }
 
 class TabCustom extends StatefulWidget {
-  final TabController pc;
-  TabCustom({this.pc});
+  final PageController pageController;
+  final int length;
+  final List items;
+  TabCustom({@required this.pageController, this.length, List items})
+      : this.items = items;
+
   @override
   _TabCustomState createState() => _TabCustomState();
 }
 
-class _TabCustomState extends State<TabCustom> {
+class _TabCustomState extends State<TabCustom>
+    with SingleTickerProviderStateMixin {
   TabController pc;
-
-  int selectedIndex = 0;
-  var selectedsizewidth = 0.0;
+  List items;
+  PageController pageController;
+  int selectedIndex = 0, length;
+  double selectedsizewidth = 0.0;
 
   @override
   void initState() {
-    pc = this.widget.pc;
+    items = this.widget.items;
+    length = items.length ?? this.widget.length;
+    pageController = this.widget.pageController;
+    pc = TabController(length: length, vsync: this);
+    pc.addListener(() {
+      pageController.animateToPage(pc.index,
+          curve: Curves.ease, duration: Duration(milliseconds: 500));
+    });
 
     super.initState();
-
-    Future.delayed(Duration(milliseconds: 100), () {
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       RenderBox a = context.findRenderObject();
-      print(a.size.width / 3);
       setState(() {
-        selectedsizewidth = a.size.width / 3;
+        selectedsizewidth = a.size.width / length;
       });
     });
   }
@@ -99,14 +106,10 @@ class _TabCustomState extends State<TabCustom> {
                   duration: Duration(milliseconds: 500),
                   top: 2,
                   bottom: 2,
-                  left: selectedIndex == 0
-                      ? 0
-                      : selectedIndex == 1
-                          ? selectedsizewidth
-                          : selectedsizewidth * 2,
-                  child: AnimatedContainer(
-                      curve: Curves.ease,
-                      duration: Duration(milliseconds: 500),
+                  left: selectedIndex * selectedsizewidth,
+                  child: Container(
+                      // curve: Curves.ease,
+                      // duration: Duration(milliseconds: 500),
                       width: selectedsizewidth,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
@@ -115,52 +118,23 @@ class _TabCustomState extends State<TabCustom> {
                 Positioned.fill(
                   child: Row(
                     children: [
-                      Expanded(
-                        child: MaterialButton(
-                          elevation: 0,
-                          child: Text('Tab 1',
-                              style: TextStyle(
-                                  color: selectedIndex == 0
-                                      ? Colors.white
-                                      : Colors.black)),
-                          onPressed: () {
-                            pc.index = 0;
-                            setState(() {
-                              selectedIndex = 0;
-                            });
-                          },
+                      for (int i = 0; i < length; i++)
+                        Expanded(
+                          child: MaterialButton(
+                            elevation: 0,
+                            child: Text(items[i] ?? 'Tab $i',
+                                style: TextStyle(
+                                    color: selectedIndex == i
+                                        ? Colors.white
+                                        : Colors.black)),
+                            onPressed: () {
+                              pc.index = i;
+                              setState(() {
+                                selectedIndex = i;
+                              });
+                            },
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: MaterialButton(
-                          child: Text('Tab 2',
-                              style: TextStyle(
-                                  color: selectedIndex == 1
-                                      ? Colors.white
-                                      : Colors.black)),
-                          onPressed: () {
-                            pc.index = 1;
-                            setState(() {
-                              selectedIndex = 1;
-                            });
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: MaterialButton(
-                          child: Text('Tab 3',
-                              style: TextStyle(
-                                  color: selectedIndex == 2
-                                      ? Colors.white
-                                      : Colors.black)),
-                          onPressed: () {
-                            pc.index = 2;
-                            setState(() {
-                              selectedIndex = 2;
-                            });
-                          },
-                        ),
-                      ),
                     ],
                   ),
                 )
@@ -188,13 +162,16 @@ class _RealFormState extends State<RealForm> {
   GlobalKey keys;
   SuggestionsBoxController sbc;
   TextEditingController tec;
+  TextEditingController harga = TextEditingController();
 
   @override
   void initState() {
-    super.initState();
+    harga.text = '5000';
+
     keys = GlobalKey();
     sbc = SuggestionsBoxController();
     tec = TextEditingController();
+    super.initState();
   }
 
   @override
@@ -233,6 +210,23 @@ class _RealFormState extends State<RealForm> {
                 },
               ),
             ),
+            Row(
+              children: [
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: harga,
+                    decoration: InputDecoration(labelText: 'Harga per pcs'),
+                  ),
+                )),
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(),
+                )),
+              ],
+            )
           ],
         ));
   }
