@@ -48,7 +48,7 @@ class TabCustom extends StatefulWidget {
   final PageController pageController;
   final int length;
   final List items;
-  TabCustom({@required this.pageController, this.length, List items})
+  TabCustom({@required this.pageController, this.length, List<String> items})
       : this.items = items;
 
   @override
@@ -58,7 +58,7 @@ class TabCustom extends StatefulWidget {
 class _TabCustomState extends State<TabCustom>
     with SingleTickerProviderStateMixin {
   TabController pc;
-  List items;
+  List<String> items;
   PageController pageController;
   int selectedIndex = 0, length;
   double selectedsizewidth = 0.0;
@@ -145,12 +145,6 @@ class _TabCustomState extends State<TabCustom>
       ),
     );
   }
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }
 }
 
 class RealForm extends StatefulWidget {
@@ -159,16 +153,16 @@ class RealForm extends StatefulWidget {
 }
 
 class _RealFormState extends State<RealForm> {
-  GlobalKey keys;
+  // GlobalKey keys;
   SuggestionsBoxController sbc;
-  TextEditingController tec;
-  TextEditingController harga = TextEditingController();
+  // TextEditingController tec;
+  TextEditingController tec, harga = TextEditingController();
 
   @override
   void initState() {
     harga.text = '5000';
 
-    keys = GlobalKey();
+    // keys = GlobalKey();
     sbc = SuggestionsBoxController();
     tec = TextEditingController();
     super.initState();
@@ -216,6 +210,7 @@ class _RealFormState extends State<RealForm> {
                     child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    enabled: false,
                     controller: harga,
                     decoration: InputDecoration(labelText: 'Harga per pcs'),
                   ),
@@ -223,7 +218,9 @@ class _RealFormState extends State<RealForm> {
                 Expanded(
                     child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: TextField(),
+                  child: TextField(
+                    decoration: InputDecoration(labelText: 'jumlah unit'),
+                  ),
                 )),
               ],
             )
