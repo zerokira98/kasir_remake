@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:kasir_remake/db.dart';
 
 class FormInsert extends StatefulWidget {
   @override
@@ -153,18 +154,16 @@ class RealForm extends StatefulWidget {
 }
 
 class _RealFormState extends State<RealForm> {
-  // GlobalKey keys;
   SuggestionsBoxController sbc;
-  // TextEditingController tec;
-  TextEditingController tec, harga = TextEditingController();
+  TextEditingController namec = TextEditingController(),
+      hargaBeli = TextEditingController(),
+      hargaJual = TextEditingController(),
+      qtyc = TextEditingController();
 
   @override
   void initState() {
-    harga.text = '5000';
-
-    // keys = GlobalKey();
+    // harga.text = '5000';
     sbc = SuggestionsBoxController();
-    tec = TextEditingController();
     super.initState();
   }
 
@@ -179,7 +178,7 @@ class _RealFormState extends State<RealForm> {
               child: TypeAheadField(
                 suggestionsBoxController: sbc,
                 textFieldConfiguration: TextFieldConfiguration(
-                    controller: tec,
+                    controller: namec,
                     // autofocus: true,
                     style: DefaultTextStyle.of(context)
                         .style
@@ -211,20 +210,44 @@ class _RealFormState extends State<RealForm> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     enabled: false,
-                    controller: harga,
-                    decoration: InputDecoration(labelText: 'Harga per pcs'),
+                    controller: hargaBeli,
+                    decoration:
+                        InputDecoration(labelText: 'Harga beli per pcs'),
                   ),
                 )),
                 Expanded(
                     child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    enabled: false,
+                    controller: hargaJual,
+                    decoration:
+                        InputDecoration(labelText: 'Harga jual per pcs'),
+                  ),
+                )),
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: qtyc,
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: 'jumlah unit'),
                   ),
                 )),
               ],
-            )
+            ),
+            RaisedButton(onPressed: () {
+              submit();
+            })
           ],
         ));
+  }
+
+  void submit() {
+    var name = namec.text;
+    var priceBuy = hargaBeli.text;
+    var priceSell = hargaJual.text;
+    var qty = qtyc.text;
+    DBHelper.instance.addItem(name, priceBuy, priceSell, qty);
   }
 }

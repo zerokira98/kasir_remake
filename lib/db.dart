@@ -23,6 +23,14 @@ class DBHelper {
     print(result);
   }
 
+  addItem(name, priceBuy, priceSell, qty) async {
+    Database database = await db;
+    String sql = '''INSERT INTO items(NAMA,HARGA_JUAL,JUMLAH) VALUES (?,?,?)''';
+    var result = await database.rawQuery(sql, [name, priceSell, qty]);
+    // String sql2 = '''INSERT INTO add_stock(PRICE,QTY,ID_BRG)''';
+    print(result);
+  }
+
   showTables() async {
     Database database = await db;
     String sql = '''SELECT name FROM sqlite_master WHERE type="table"''';
@@ -42,29 +50,29 @@ class DBHelper {
     String path = join(dir, _dbName);
     return await openDatabase(path, version: _dbVersion,
         onCreate: (db, _dbversion) async {
+      // `ID_LOG` int NOT NULL,
       await db.execute('''
         CREATE TABLE `add_stock` (
-  `ID_LOG` int NOT NULL,
   `PRICE` decimal(10,0) NOT NULL,
   `QTY` int NOT NULL,
   `EXP` date DEFAULT NULL,
   `ADD_DATE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `ID_BRG` int NOT NULL,
-  `SUPPLIER_ID` int NOT NULL);
+  `ID_BRG` int  NULL,
+  `SUPPLIER_ID` int  NULL);
         ''');
+      // `ID` int NOT NULL,
       await db.execute('''
 CREATE TABLE `items` (
   `NAMA` varchar(50) NOT NULL,
-  `ID` int NOT NULL,
   `BARCODE` int DEFAULT NULL,
   `JUMLAH` smallint NOT NULL,
   `EXP_DATE` date DEFAULT NULL,
   `TGL_POSTING` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `HARGA_JUAL` decimal(10,0) NOT NULL
 ) ;''');
+      // `ID` int NOT NULL,
       await db.execute('''
 CREATE TABLE `transaction` (
-  `ID` int NOT NULL,
   `TANGGAL` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ''');
