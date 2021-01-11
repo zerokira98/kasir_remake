@@ -31,7 +31,7 @@ class NewBlocObserver extends BlocObserver {
   @override
   void onTransition(Bloc bloc, Transition transition) {
     print(transition);
-    print(bloc);
+    // print(bloc);
     super.onTransition(bloc, transition);
   }
 }

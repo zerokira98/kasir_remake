@@ -24,7 +24,8 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   ) async* {
     if (event is LoadInitial) {
       print('initial');
-      yield TransactionLoaded(data: [Item(id: Random().nextInt(210))]);
+      yield TransactionLoaded(
+          data: [Item(id: Random().nextInt(210), open: true)]);
     }
     if (event is UpdateItem) {
       yield TransactionLoaded(
@@ -34,31 +35,33 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     }
     if (event is AddItem) {
       if (state is TransactionLoaded) {
-        print('add item');
-        // yield* _mapadd(event);
+        var newItem = Item(id: Random().nextInt(210), open: false);
         yield TransactionLoaded(
-          data: (state as TransactionLoaded).data +
-              [Item(id: Random().nextInt(210))],
+          data: (state as TransactionLoaded).data + [newItem],
         );
+        await Future.delayed(Duration(milliseconds: 50), () {});
+        yield TransactionLoaded(
+            data: (state as TransactionLoaded).data.map((e) {
+          return e.id != newItem.id ? e : newItem.copywith(open: true);
+        }).toList());
       }
     }
     if (event is DeleteItem) {
       print('delete item');
-      print((state as TransactionLoaded).data);
+      yield TransactionLoaded(
+          data: (state as TransactionLoaded).data.map((e) {
+        return e.id != event.item.id ? e : event.item.copywith(open: false);
+      }).toList());
+
+      await Future.delayed(Duration(milliseconds: 500), () {});
+      print('a2${(state as TransactionLoaded).data}');
       yield TransactionLoaded(
           data: (state as TransactionLoaded)
               .data
-              .where((element) => (element != event.item))
+              .where((element) => (element.open != false))
               .toList());
+      print(
+          'a ${(state as TransactionLoaded).data.where((element) => (element != event.item.copywith(open: false))).toList()}');
     }
-  }
-
-  Stream<TransactionState> _mapadd(TransactionEvent event) async* {
-    final List<Item> a = List.from(((state as TransactionLoaded).data)
-      ..add(Item(
-        id: Random().nextInt(210),
-      )));
-    print(a);
-    yield TransactionLoaded(data: a);
   }
 }

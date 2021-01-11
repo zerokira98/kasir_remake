@@ -78,50 +78,57 @@ class _TransaksiPageState extends State<TransaksiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       // bottomNavigationBar: Container(),
-      body: Stack(
+      body: Column(
         children: [
-          Positioned.fill(child: Container(
+          Expanded(
             child: SingleChildScrollView(
               child: BlocBuilder<TransactionBloc, TransactionState>(
                 builder: (context, state) {
                   if (state is TransactionLoaded) {
+                    List<Widget> data = state.data
+                        .map<Widget>((e) => TransactionItemCard(
+                              item: e,
+                              key: Key(e.id.toString()),
+                              // key: GlobalKey(),
+                            ))
+                        .toList();
                     return Column(
-                      children: [
-                        for (int i = 0; i < state.data.length; i++)
-                          TransactionItemCard(item: state.data[i]),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 16),
-                              child: MaterialButton(
-                                color: Colors.green,
-                                onPressed: () {
-                                  BlocProvider.of<TransactionBloc>(context)
-                                      .add(AddItem());
-                                },
-                                child: Padding(
-                                    padding: EdgeInsets.all(8),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.add,
-                                          color: Colors.white,
-                                        ),
-                                        Text(
-                                          'Tambah barang',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ],
-                                    )),
-                              ),
-                            )),
+                      children: data +
+                          <Widget>[
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 16),
+                                  child: MaterialButton(
+                                    color: Theme.of(context).primaryColor,
+                                    onPressed: () {
+                                      BlocProvider.of<TransactionBloc>(context)
+                                          .add(AddItem());
+                                    },
+                                    child: Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.add,
+                                              color: Colors.white,
+                                            ),
+                                            Text(
+                                              'Tambah barang',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        )),
+                                  ),
+                                )),
+                              ],
+                            ),
                           ],
-                        ),
-                      ],
                     );
                   } else {
                     return CircularProgressIndicator();
@@ -129,61 +136,58 @@ class _TransaksiPageState extends State<TransaksiPage> {
                 },
               ),
             ),
-          )),
+          ),
 
           /// Bottom total + checkout button
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 18),
-              decoration: BoxDecoration(
-                  color: Colors.blueGrey[50],
-                  border: Border(top: BorderSide())),
-              height: 56,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(child: Container(
-                    // color: Colors.red,
-                    child: BlocBuilder<TransactionBloc, TransactionState>(
-                      builder: (context, state) {
-                        var total = 0;
-                        if (state is TransactionLoaded) {
-                          state.data.forEach((e) {
-                            if (e.pcs != null && e.hargaJual != null) {
-                              total += e.pcs * e.hargaJual;
-                            }
-                          });
-                          // if(total.length>4);
-                          return Text('total : ${numFormat.format(total)}');
-                        }
-                        return Text('total : ');
-                      },
-                    ),
-                  )),
-                  Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [BoxShadow()],
-                      color: Colors.blueGrey[400],
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_cart_outlined,
-                          size: 32,
-                          color: Colors.white,
-                        ),
-                        Text('CheckOut')
-                      ],
-                    ),
-                  )
-                ],
-              ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 18),
+            decoration: BoxDecoration(
+                color: Colors.green[100], border: Border(top: BorderSide())),
+            height: 56,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(child: Container(
+                  // color: Colors.red,
+                  child: BlocBuilder<TransactionBloc, TransactionState>(
+                    builder: (context, state) {
+                      var total = 0;
+                      if (state is TransactionLoaded) {
+                        state.data.forEach((e) {
+                          if (e.pcs != null && e.hargaJual != null) {
+                            total += e.pcs * e.hargaJual;
+                          }
+                        });
+                        // if(total.length>4);
+                        return Text('total : ${numFormat.format(total)}');
+                      }
+                      return Text('total : ');
+                    },
+                  ),
+                )),
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [BoxShadow()],
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 32,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        'CheckOut',
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ],
+                  ),
+                )
+              ],
             ),
           )
         ],

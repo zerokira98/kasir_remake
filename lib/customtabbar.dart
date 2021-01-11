@@ -59,6 +59,8 @@ class _TabCustomState extends State<TabCustom>
                       color: Colors.grey[100]),
                   height: 42,
                 ),
+
+                ///selected container
                 AnimatedPositioned(
                   curve: Curves.ease,
                   duration: Duration(milliseconds: 500),
@@ -66,12 +68,11 @@ class _TabCustomState extends State<TabCustom>
                   bottom: 2,
                   left: selectedIndex * selectedsizewidth,
                   child: Container(
-                      // curve: Curves.ease,
-                      // duration: Duration(milliseconds: 500),
                       width: selectedsizewidth,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.blue)),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).primaryColor,
+                      )),
                 ),
                 Positioned.fill(
                   child: Row(

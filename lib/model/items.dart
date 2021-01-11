@@ -37,11 +37,11 @@ class Item extends Equatable {
   }
 
   @override
-  List<Object> get props => [name, hargaBeli, hargaJual, pcs, tempatBeli, id];
+  List<Object> get props =>
+      [name, hargaBeli, hargaJual, pcs, tempatBeli, id, open];
 
   @override
   String toString() {
-    // TODO: implement toString
-    return '{id: $id,nama: $name}';
+    return '{id: $id,nama: $name,open:$open}';
   }
 }
