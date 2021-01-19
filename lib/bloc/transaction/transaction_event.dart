@@ -10,15 +10,17 @@ class LoadInitial extends TransactionEvent {}
 
 class AddItem extends TransactionEvent {}
 
+class UploadToDB extends TransactionEvent {}
+
 class UpdateItem extends TransactionEvent {
-  final Item item;
+  final ItemTr item;
   UpdateItem(this.item);
   @override
   List<Object> get props => [item];
 }
 
 class DeleteItem extends TransactionEvent {
-  final Item item;
+  final ItemTr item;
   DeleteItem(this.item);
   @override
   List<Object> get props => [item];

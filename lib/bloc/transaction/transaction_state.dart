@@ -9,8 +9,10 @@ abstract class TransactionState extends Equatable {
 
 class TransactionInitial extends TransactionState {}
 
+class TransactionLoading extends TransactionState {}
+
 class TransactionLoaded extends TransactionState {
-  final List<Item> data;
+  final List<ItemTr> data;
   TransactionLoaded({this.data});
   @override
   List<Object> get props => [data, data.length];

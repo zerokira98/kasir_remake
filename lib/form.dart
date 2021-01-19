@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:kasir_remake/bloc/transaction_bloc.dart';
+import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
+import 'package:kasir_remake/checkout.dart';
 import 'package:kasir_remake/customtabbar.dart';
-import 'package:kasir_remake/db.dart';
+import 'package:kasir_remake/msc/db.dart';
 import 'package:kasir_remake/insertbaru.dart';
+import 'package:kasir_remake/pulsa.dart';
 import 'package:kasir_remake/trItemCard.dart';
 import 'package:intl/intl.dart';
 
@@ -30,12 +32,12 @@ class _FormInsertState extends State<FormInsert> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Padding(
-              padding: EdgeInsets.all(0.0),
-              child: TabCustom(
-                  pageController: pageC,
-                  length: 1,
-                  items: ['Input Barang', 'Transaksi', 'DM'])),
+          // Padding(
+          //     padding: EdgeInsets.all(0.0),
+          //     child: TabCustom(
+          //         pageController: pageC,
+          //         length: 1,
+          //         items: ['Input Barang', 'Transaksi', 'DM'])),
           Expanded(
             child: PageView.builder(
                 itemCount: 5,
@@ -43,9 +45,7 @@ class _FormInsertState extends State<FormInsert> {
                 itemBuilder: (context, i) {
                   if (i == 0) return InsertProductPage();
                   if (i == 1) return TransaksiPage();
-                  return Center(
-                    child: Text('page $i'),
-                  );
+                  return TransaksiPulsa();
                 }),
           )
         ],
@@ -60,14 +60,6 @@ class TransaksiPage extends StatefulWidget {
 }
 
 class _TransaksiPageState extends State<TransaksiPage> {
-  List datas = ['data'];
-
-  reduce() {
-    setState(() {
-      datas.removeAt(datas.length - 1);
-    });
-  }
-
   @override
   initState() {
     // datas.add('data');
@@ -77,7 +69,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // bottomNavigationBar: Container(),
+      appBar: AppBar(
+        title: Text('Transaksi'),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -89,7 +83,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
                         .map<Widget>((e) => TransactionItemCard(
                               item: e,
                               key: Key(e.id.toString()),
-                              // key: GlobalKey(),
                             ))
                         .toList();
                     return Column(
@@ -142,8 +135,12 @@ class _TransaksiPageState extends State<TransaksiPage> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 18),
             decoration: BoxDecoration(
-                color: Colors.green[100], border: Border(top: BorderSide())),
-            height: 56,
+                color: Colors.blue[600],
+                border: Border(
+                  top: BorderSide(width: 2.0, color: Colors.blueGrey[300]),
+                  bottom: BorderSide(width: 2.0, color: Colors.blueGrey[300]),
+                )),
+            height: 64,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -159,32 +156,48 @@ class _TransaksiPageState extends State<TransaksiPage> {
                           }
                         });
                         // if(total.length>4);
-                        return Text('total : ${numFormat.format(total)}');
+                        return Text(
+                          'Total : ${numFormat.format(total)}',
+                          textScaleFactor: 1.25,
+                          style: TextStyle(color: Colors.white, shadows: [
+                            Shadow(blurRadius: 4.0, color: Colors.green),
+                          ]),
+                        );
                       }
                       return Text('total : ');
                     },
                   ),
                 )),
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [BoxShadow()],
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 32,
-                        color: Colors.white,
-                      ),
-                      Text(
-                        'CheckOut',
-                        style: TextStyle(color: Colors.white),
-                      )
-                    ],
+                InkWell(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => CheckOutTr()));
+                  },
+                  child: Container(
+                    margin: EdgeInsets.all(2.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(blurRadius: 4.0, color: Colors.black87)
+                      ],
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 32,
+                          color: Colors.white,
+                        ),
+                        Text(
+                          'CheckOut',
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    ),
                   ),
                 )
               ],

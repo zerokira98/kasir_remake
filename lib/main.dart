@@ -2,8 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kasir_remake/bloc/transaction_bloc.dart';
-import 'package:kasir_remake/db.dart';
+import 'package:kasir_remake/bloc/stock/stock_bloc.dart';
+import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
+import 'package:kasir_remake/msc/db.dart';
 import 'package:kasir_remake/form.dart';
 import 'package:kasir_remake/protopage.dart';
 import 'package:bloc/bloc.dart';
@@ -18,7 +19,7 @@ class NewBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object event) {
     print(event);
-    print(bloc);
+    // print(bloc);
     super.onEvent(bloc, event);
   }
 
@@ -39,14 +40,24 @@ class NewBlocObserver extends BlocObserver {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TransactionBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => TransactionBloc(),
+        ),
+        BlocProvider(
+          create: (context) => StockBloc(),
+        )
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder()
+          }),
           primarySwatch: Colors.blue,
         ),
-        home: MyHomePage(title: 'Flutter Demo Home Page'),
+        home: MyHomePage(title: 'Flutt'),
       ),
     );
   }
@@ -62,16 +73,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    var dbase = DBHelper.instance.showTables();
-
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,16 +80,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: GridView.count(
+          crossAxisCount: 2,
+          // gridDelegate: ,
+          // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
             ElevatedButton(
               child: Text('press close'),
               onPressed: () {
@@ -121,13 +117,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(builder: (context) => FormInsert()));
               },
             ),
+            ElevatedButton(
+              child: Text('form page'),
+              onPressed: () {
+                DBHelper.instance.insideTrans();
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => FormInsert()));
+              },
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:kasir_remake/bloc/transaction_bloc.dart';
-import 'package:kasir_remake/db.dart';
-import 'package:kasir_remake/model/items.dart';
+import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
+import 'package:kasir_remake/msc/db.dart';
+import 'package:kasir_remake/model/item_tr.dart';
 
 class TransactionItemCard extends StatefulWidget {
   @override
@@ -11,7 +11,7 @@ class TransactionItemCard extends StatefulWidget {
   final VoidCallback closeCall;
   final Key _key;
 
-  final Item item;
+  final ItemTr item;
   TransactionItemCard({this.closeCall, this.item, Key key}) : _key = key;
 
   @override
@@ -30,12 +30,21 @@ class _TransactionItemCardState extends State<TransactionItemCard>
 
   final hargaSatuan = TextEditingController();
 
+  Future delayQty;
+
   @override
   Widget build(BuildContext context) {
     // (BlocProvider.of<TransactionBloc>(context).state as TransactionLoaded).data[index];
     return BlocBuilder<TransactionBloc, TransactionState>(
       builder: (context, state) {
         if (state is TransactionLoaded) {
+          namaC.text = widget.item.name ?? '';
+          hargaSatuan.text = widget.item.hargaJual?.toString() ?? '';
+          if (qtyC.text != widget.item.pcs?.toString())
+            qtyC.text = widget.item.pcs?.toString() ?? '';
+          totalC.text = qtyC.text.isNotEmpty && hargaSatuan.text.isNotEmpty
+              ? (int.parse(qtyC.text) * int.parse(hargaSatuan.text)).toString()
+              : '';
           Widget theWidget = Container(
             padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 16.0),
             margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
@@ -65,11 +74,12 @@ class _TransactionItemCardState extends State<TransactionItemCard>
                     namaC.text = suggestion['NAMA'];
                     hargaSatuan.text = suggestion['HARGA_JUAL'].toString();
                     totalC.text = (int.parse(hargaSatuan.text)).toString();
-                    // item.copywith();
+                    print('product id: ${suggestion['ID']}');
                     BlocProvider.of<TransactionBloc>(context)
                         .add(UpdateItem(widget.item.copywith(
                       name: namaC.text,
                       pcs: int.parse(qtyC.text),
+                      productId: suggestion['ID'],
                       hargaJual: int.parse(hargaSatuan.text),
                     )));
                   },
@@ -96,15 +106,10 @@ class _TransactionItemCardState extends State<TransactionItemCard>
                             totalC.text =
                                 (int.parse(s) * int.parse(hargaSatuan.text))
                                     .toString();
-                            Future.delayed(Duration(seconds: 2), () {
-                              BlocProvider.of<TransactionBloc>(context).add(
-                                  UpdateItem(
-                                      widget.item.copywith(pcs: int.parse(s))));
-                              FocusScope.of(context).unfocus();
-                            });
+                            BlocProvider.of<TransactionBloc>(context).add(
+                                UpdateItem(
+                                    widget.item.copywith(pcs: int.parse(s))));
                           }
-                          // qtyC.selection = TextSelection.fromPosition(
-                          //     TextPosition(offset: qtyC.text.length));
                         },
                         decoration: InputDecoration(labelText: 'Qty'),
                       ),
@@ -131,13 +136,6 @@ class _TransactionItemCardState extends State<TransactionItemCard>
               ],
             )),
           );
-          namaC.text = widget.item.name ?? '';
-          hargaSatuan.text = widget.item.hargaJual?.toString() ?? '';
-          if (qtyC.text != widget.item.pcs?.toString())
-            qtyC.text = widget.item.pcs?.toString() ?? '';
-          totalC.text = qtyC.text.isNotEmpty && hargaSatuan.text.isNotEmpty
-              ? (int.parse(qtyC.text) * int.parse(hargaSatuan.text)).toString()
-              : '';
           return GestureDetector(
             onHorizontalDragUpdate: (val) {
               print(val.globalPosition);
@@ -178,6 +176,7 @@ class _TransactionItemCardState extends State<TransactionItemCard>
             ),
           );
         }
+        return CircularProgressIndicator();
       },
     );
   }

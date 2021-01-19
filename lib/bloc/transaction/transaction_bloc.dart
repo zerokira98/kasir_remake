@@ -4,7 +4,8 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/semantics.dart';
-import 'package:kasir_remake/model/items.dart';
+import 'package:kasir_remake/msc/db.dart';
+import 'package:kasir_remake/model/item_tr.dart';
 import 'dart:math' as math;
 import 'package:meta/meta.dart';
 // import '';
@@ -25,7 +26,19 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     if (event is LoadInitial) {
       print('initial');
       yield TransactionLoaded(
-          data: [Item(id: Random().nextInt(210), open: true)]);
+          data: [ItemTr(id: Random().nextInt(210), open: true)]);
+    }
+    if (event is UploadToDB) {
+      var data = (state as TransactionLoaded).data;
+      yield TransactionLoading();
+      try {
+        await DBHelper.instance.transaction(data);
+        yield TransactionInitial();
+        add(LoadInitial());
+      } catch (e) {
+        print('error $e');
+        yield (TransactionLoaded(data: data));
+      }
     }
     if (event is UpdateItem) {
       yield TransactionLoaded(
@@ -35,7 +48,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     }
     if (event is AddItem) {
       if (state is TransactionLoaded) {
-        var newItem = Item(id: Random().nextInt(210), open: false);
+        var newItem = ItemTr(id: Random().nextInt(210), open: false);
         yield TransactionLoaded(
           data: (state as TransactionLoaded).data + [newItem],
         );
@@ -54,14 +67,11 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       }).toList());
 
       await Future.delayed(Duration(milliseconds: 500), () {});
-      print('a2${(state as TransactionLoaded).data}');
       yield TransactionLoaded(
           data: (state as TransactionLoaded)
               .data
               .where((element) => (element.open != false))
               .toList());
-      print(
-          'a ${(state as TransactionLoaded).data.where((element) => (element != event.item.copywith(open: false))).toList()}');
     }
   }
 }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 enum Provider { Telkomsel, Indosat, Xl, Axis, Three, Smartfren, Unidentified }
+
+final numFormat = NumberFormat("#,##0", "en_US");
 
 class TransaksiPulsa extends StatefulWidget {
   @override
@@ -54,6 +57,14 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
   bool get isValid => provider != Provider.Unidentified && nomorHP.length > 10;
 
   int nominalValue;
+  var nominalData = [
+    5000,
+    10000,
+    20000,
+    0,
+    50000,
+    100000,
+  ];
   void nomorListener() {
     nomorHP = nomorController.text.trim();
     if (nomorController.text.length >= 4) {
@@ -66,6 +77,11 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
         provider = Provider.Unidentified;
       });
     }
+    if (provider == Provider.Three) {
+      nominalData[3] = 30000;
+    } else {
+      nominalData[3] = 25000;
+    }
     kodeController.text =
         kode + nominal + '.' + nomorController.text + '.' + pin;
   }
@@ -73,22 +89,22 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
   String getCode(Provider pvd) {
     switch (pvd) {
       case Provider.Axis:
-        return 'AX';
+        return 'X';
         break;
       case Provider.Indosat:
         return 'MM';
         break;
       case Provider.Smartfren:
-        return 'RT';
+        return 'I';
         break;
       case Provider.Telkomsel:
-        return 'SJ';
+        return 'S';
         break;
       case Provider.Three:
         return 'T';
         break;
       case Provider.Xl:
-        return 'XB';
+        return 'X';
         break;
       default:
         return '';
@@ -137,44 +153,12 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
                   DropdownButton(
                       hint: Text('Pilih'),
                       value: nominalValue,
-                      items: [
-                        // DropdownMenuItem(
-                        //   child: Text('0'),
-                        //   value: 0,
-                        // ),
-                        DropdownMenuItem(
-                          child: Text('5.000'),
-                          value: 5000,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('10.000'),
-                          value: 10000,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('20.000'),
-                          value: 20000,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('25.000'),
-                          value: 25000,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('30.000'),
-                          value: 30000,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('40.000'),
-                          value: 40000,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('50.000'),
-                          value: 50000,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('100.000'),
-                          value: 100000,
-                        ),
-                      ],
+                      items: nominalData.map((e) {
+                        return DropdownMenuItem(
+                          child: Text('${numFormat.format(e)}'),
+                          value: e,
+                        );
+                      }).toList(),
                       onChanged: (val) {
                         setState(() {
                           nominalValue = val;
@@ -264,7 +248,9 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
                     child: MaterialButton(
                       color: Colors.blue,
                       onPressed: () async {
-                        var uri = 'sms:$smsCenter?body=${kodeController.text}';
+                        // var uri = 'sms:$smsCenter?body=${kodeController.text}';
+                        var uri =
+                            'whatsapp://send?phone=$smsCenter?text=${kodeController.text}';
                         if (await canLaunch(uri)) {
                           print(uri);
                           launch(uri);
