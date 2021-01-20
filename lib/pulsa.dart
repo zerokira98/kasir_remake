@@ -250,7 +250,7 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
                       onPressed: () async {
                         // var uri = 'sms:$smsCenter?body=${kodeController.text}';
                         var uri =
-                            'whatsapp://send?phone=$smsCenter?text=${kodeController.text}';
+                            'whatsapp://phone=$smsCenter?text=${kodeController.text}';
                         if (await canLaunch(uri)) {
                           print(uri);
                           launch(uri);

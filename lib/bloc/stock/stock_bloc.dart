@@ -63,7 +63,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
                   open: false)
             ]);
 
-        // await Future.delayed(Duration(milliseconds: 500));
+        await Future.delayed(Duration(milliseconds: 500));
         yield StockLoaded((state as StockLoaded)
             .data
             .map((e) => e.open == false ? e.copywith(open: true) : e)
