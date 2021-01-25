@@ -15,5 +15,5 @@ class TransactionLoaded extends TransactionState {
   final List<ItemTr> data;
   TransactionLoaded({this.data});
   @override
-  List<Object> get props => [data, data.length];
+  List<Object> get props => [data];
 }

@@ -7,7 +7,7 @@ class ItemTr extends Equatable {
   final int pcs;
   final int productId;
   final String tempatBeli;
-  final int barcode;
+  final String barcode;
   final int id;
   final bool open;
   final DateTime expdate;
@@ -18,7 +18,7 @@ class ItemTr extends Equatable {
       this.productId,
       this.hargaJual,
       this.pcs,
-      int barcode,
+      String barcode,
       String tempatBeli,
       this.open,
       this.expdate,
@@ -34,7 +34,7 @@ class ItemTr extends Equatable {
       String tempatBeli,
       int productId,
       bool open,
-      int barcode,
+      String barcode,
       DateTime expdate,
       int id}) {
     return ItemTr(

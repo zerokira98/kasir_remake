@@ -246,7 +246,7 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
                 children: [
                   Expanded(
                     child: MaterialButton(
-                      color: Colors.blue,
+                      color: Theme.of(context).primaryColor,
                       onPressed: () async {
                         // var uri = 'sms:$smsCenter?body=${kodeController.text}';
                         var uri =

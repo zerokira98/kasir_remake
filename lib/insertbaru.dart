@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:kasir_remake/bloc/stock/stock_bloc.dart';
@@ -11,19 +12,11 @@ class InsertProductPage extends StatefulWidget {
 }
 
 class _InsertProductPageState extends State<InsertProductPage> {
-  // int length = 1;
-  // void delete() {
-  //   setState(() {
-  //     length--;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Masuk Barang'),
-        // primary: false,
       ),
       body: Container(
         // padding: EdgeInsets.only(top: 12.0),
@@ -33,6 +26,9 @@ class _InsertProductPageState extends State<InsertProductPage> {
         child: SingleChildScrollView(
           child: BlocBuilder<StockBloc, StockState>(
             builder: (context, state) {
+              if (state is StockLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
               if (state is StockLoaded) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -45,9 +41,6 @@ class _InsertProductPageState extends State<InsertProductPage> {
                       onPressed: () {
                         BlocProvider.of<StockBloc>(context)
                             .add(NewStockEntry());
-                        // setState(() {
-                        //   length++;
-                        // });
                         print('tambah\'ed');
                       },
                       child: Text('Tambah Item'),
@@ -86,23 +79,33 @@ class _InsertProductCardState extends State<InsertProductCard>
     with TickerProviderStateMixin {
   SuggestionsBoxController sbc;
   TextEditingController namec = TextEditingController(),
-      hargaBeli = TextEditingController(),
+      hargaBeli,
       hargaJual = TextEditingController(),
       datec = TextEditingController(),
       placec = TextEditingController(),
+      barcodeC = TextEditingController(),
       qtyc = TextEditingController();
   final _formkey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
   @override
   void initState() {
-    // harga.text = '5000';
     sbc = SuggestionsBoxController();
+    hargaBeli = TextEditingController();
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.data.name != namec.text) {
+      namec.text = widget.data.name ?? '';
+    }
+    if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
+      hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
+    }
+    if (widget.data.hargaJual?.toString() != hargaJual.text) {
+      hargaJual.text = widget.data.hargaJual?.toString() ?? '';
+    }
     Widget bottom = Row(
       children: [
         Expanded(
@@ -131,6 +134,25 @@ class _InsertProductCardState extends State<InsertProductCard>
             decoration: InputDecoration(labelText: 'Expiration date'),
           ),
         )),
+        Expanded(
+          child: TextFormField(
+            controller: barcodeC,
+            decoration: InputDecoration(
+                labelText: 'barcode',
+                suffixIcon: InkWell(
+                    onTap: () async {
+                      String barcodeScan =
+                          await FlutterBarcodeScanner.scanBarcode(
+                              '#ffffff', 'Cancel', false, ScanMode.BARCODE);
+                      print(barcodeScan);
+                      barcodeC.text = barcodeScan;
+
+                      BlocProvider.of<StockBloc>(context).add(OnDataChanged(
+                          widget.data.copywith(barcode: barcodeScan)));
+                    },
+                    child: Icon(Icons.qr_code))),
+          ),
+        ),
         Expanded(
             child: Padding(
           padding: const EdgeInsets.all(4.0),
@@ -192,8 +214,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                             border: OutlineInputBorder(),
                             labelText: 'Nama item')),
                     suggestionsCallback: (pattern) async {
-                      var res =
-                          await DBHelper.instance.showInsideItems(pattern);
+                      var res = await DBHelper.instance
+                          .showInsideItems(query: pattern);
                       return res;
                       // return await BackendService.getSuggestions(pattern);
                     },
@@ -208,38 +230,45 @@ class _InsertProductCardState extends State<InsertProductCard>
                       var res = await DBHelper.instance
                           .showInsideStock(suggestion['ID']);
                       // print(res);
-                      hargaBeli.text = res.last['PRICE'].toString();
-                      namec.text = suggestion['NAMA'];
-                      // hargaBeli.text = suggestion['']
-                      hargaJual.text = suggestion['HARGA_JUAL'].toString();
+                      BlocProvider.of<StockBloc>(context)
+                          .add(OnDataChanged(widget.data.copywith(
+                        name: suggestion['NAMA'],
+                        hargaBeli: res.last['PRICE'],
+                        hargaJual: suggestion['HARGA_JUAL'],
+                      )));
+                      // hargaBeli.text = res.last['PRICE'].toString();
+                      // namec.text = suggestion['NAMA'];
+                      // // hargaBeli.text = suggestion['']
+                      // hargaJual.text = suggestion['HARGA_JUAL'].toString();
                     },
                   ),
                 ),
                 Row(
                   children: [
                     Expanded(
+                        flex: 1,
                         child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: TextFormField(
-                        autovalidateMode: AutovalidateMode.always,
-                        validator: (text) {
-                          if (text.isNotEmpty &&
-                              !RegExp(r'^[0-9]').hasMatch(text)) {
-                            return 'must be a number';
-                          }
-                          return null;
-                        },
-                        onChanged: (v) {
-                          BlocProvider.of<StockBloc>(context)
-                              .add(OnDataChanged(widget.data.copywith(
-                            hargaBeli: int.parse(hargaBeli.text),
-                          )));
-                        },
-                        controller: hargaBeli,
-                        decoration:
-                            InputDecoration(labelText: 'Harga beli per pcs'),
-                      ),
-                    )),
+                          padding: const EdgeInsets.all(4.0),
+                          child: TextFormField(
+                            autovalidateMode: AutovalidateMode.always,
+                            validator: (text) {
+                              if (text.isNotEmpty &&
+                                  !RegExp(r'^[0-9]').hasMatch(text)) {
+                                return 'must be a number';
+                              }
+                              return null;
+                            },
+                            onChanged: (v) {
+                              BlocProvider.of<StockBloc>(context)
+                                  .add(OnDataChanged(widget.data.copywith(
+                                hargaBeli: int.parse(hargaBeli.text),
+                              )));
+                            },
+                            controller: hargaBeli,
+                            decoration: InputDecoration(
+                                labelText: 'Harga beli per pcs'),
+                          ),
+                        )),
                     Expanded(
                         child: Padding(
                       padding: const EdgeInsets.all(4.0),
@@ -271,7 +300,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                     )),
                     if (MediaQuery.of(context).orientation ==
                         Orientation.landscape)
-                      Expanded(flex: 2, child: bottom)
+                      Expanded(flex: 3, child: bottom)
                   ],
                 ),
                 if (MediaQuery.of(context).orientation == Orientation.portrait)

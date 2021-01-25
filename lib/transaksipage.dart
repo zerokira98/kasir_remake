@@ -4,55 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
 import 'package:kasir_remake/checkout.dart';
-import 'package:kasir_remake/customtabbar.dart';
-import 'package:kasir_remake/msc/db.dart';
-import 'package:kasir_remake/insertbaru.dart';
-import 'package:kasir_remake/pulsa.dart';
 import 'package:kasir_remake/trItemCard.dart';
 import 'package:intl/intl.dart';
 
 final numFormat = new NumberFormat("#,##0.00", "en_US");
-
-class FormInsert extends StatefulWidget {
-  @override
-  _FormInsertState createState() => _FormInsertState();
-}
-
-class _FormInsertState extends State<FormInsert> {
-  PageController pageC = PageController(initialPage: 0);
-  @override
-  initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          // Padding(
-          //     padding: EdgeInsets.all(0.0),
-          //     child: TabCustom(
-          //         pageController: pageC,
-          //         length: 1,
-          //         items: ['Input Barang', 'Transaksi', 'DM'])),
-          Expanded(
-            child: PageView.builder(
-                itemCount: 5,
-                controller: pageC,
-                itemBuilder: (context, i) {
-                  if (i == 0) return InsertProductPage();
-                  if (i == 1) return TransaksiPage();
-                  return TransaksiPulsa();
-                }),
-          )
-        ],
-      ),
-    );
-  }
-}
 
 class TransaksiPage extends StatefulWidget {
   @override
@@ -135,7 +90,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 18),
             decoration: BoxDecoration(
-                color: Colors.blue[600],
+                color: Theme.of(context).primaryColorDark,
                 border: Border(
                   top: BorderSide(width: 2.0, color: Colors.blueGrey[300]),
                   bottom: BorderSide(width: 2.0, color: Colors.blueGrey[300]),

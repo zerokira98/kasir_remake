@@ -4,37 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/bloc/stock/stock_bloc.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
-import 'package:kasir_remake/msc/db.dart';
-import 'package:kasir_remake/form.dart';
-import 'package:kasir_remake/protopage.dart';
+import 'package:kasir_remake/insertbaru.dart';
+import 'package:kasir_remake/msc/bloc_observer.dart';
+import 'package:kasir_remake/page/debug.dart';
+import 'package:kasir_remake/page/stats.dart';
+import 'package:kasir_remake/transaksipage.dart';
 import 'package:bloc/bloc.dart';
+import 'package:kasir_remake/pulsa.dart';
 
 void main() {
   EquatableConfig.stringify = kDebugMode;
   Bloc.observer = NewBlocObserver();
   runApp(MyApp());
-}
-
-class NewBlocObserver extends BlocObserver {
-  @override
-  void onEvent(Bloc bloc, Object event) {
-    print(event);
-    // print(bloc);
-    super.onEvent(bloc, event);
-  }
-
-  @override
-  void onError(Cubit cubit, Object error, StackTrace stacktrace) {
-    print(error);
-    super.onError(cubit, error, stacktrace);
-  }
-
-  @override
-  void onTransition(Bloc bloc, Transition transition) {
-    print(transition);
-    // print(bloc);
-    super.onTransition(bloc, transition);
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -55,79 +36,70 @@ class MyApp extends StatelessWidget {
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.android: CupertinoPageTransitionsBuilder()
           }),
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.red,
         ),
-        home: MyHomePage(title: 'Flutt'),
+        home: HomePage(),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
+class HomePage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
+  int navIndex = 0;
+  PageController pageC = PageController(initialPage: 0);
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: GridView.count(
-          crossAxisCount: 2,
-          // gridDelegate: ,
-          // mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              child: Text('press close'),
-              onPressed: () {
-                DBHelper.instance.closeDb();
-              },
-            ),
-            ElevatedButton(
-              child: Text('press inside items'),
-              onPressed: () {
-                DBHelper.instance.showInsideItems();
-              },
-            ),
-            ElevatedButton(
-              child: Text('press inside add_stock'),
-              onPressed: () {
-                DBHelper.instance.showInsideStock();
-              },
-            ),
-            ElevatedButton(
-              child: Text('test'),
-              onPressed: () {
-                DBHelper.instance.test();
-              },
-            ),
-            ElevatedButton(
-              child: Text('form page'),
-              onPressed: () {
-                // DBHelper.instance.test();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => FormInsert()));
-              },
-            ),
-            ElevatedButton(
-              child: Text('form page'),
-              onPressed: () {
-                DBHelper.instance.insideTrans();
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (context) => FormInsert()));
-              },
+        // appBar: AppBar(
+        //   title: Text(widget.title),
+        // ),
+        bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            onTap: (i) {
+              setState(() {
+                navIndex = i;
+              });
+              pageC.animateToPage(i,
+                  duration: Duration(milliseconds: 500), curve: Curves.ease);
+            },
+            currentIndex: navIndex,
+            items: [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.shop), label: 'Transaksi'),
+              BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
+              // BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
+              BottomNavigationBarItem(icon: Icon(Icons.phone), label: 'Pulsa'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.fire_extinguisher), label: 'debug'),
+            ]),
+        body: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: 5,
+                  controller: pageC,
+                  itemBuilder: (context, i) {
+                    if (i == 0) return Stats();
+                    if (i == 1) return TransaksiPage();
+                    if (i == 2) return InsertProductPage();
+                    if (i == 3) return TransaksiPulsa();
+                    if (i == 4) return DebugPage();
+                    return CircularProgressIndicator();
+                  }),
             ),
           ],
-        ),
-      ),
-    );
+        ));
   }
 }

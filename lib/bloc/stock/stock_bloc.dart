@@ -44,8 +44,11 @@ class StockBloc extends Bloc<StockEvent, StockState> {
             .toList());
       }
       if (event is UploadtoDB) {
+        var data = (state as StockLoaded).data;
+        yield (StockLoading());
+        await Future.delayed(Duration(seconds: 1));
         try {
-          await DBHelper.instance.addItem((state as StockLoaded).data);
+          await DBHelper.instance.addItem(data);
           print('here1');
           yield StockInitial();
           print('here2');

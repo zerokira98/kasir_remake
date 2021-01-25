@@ -41,10 +41,11 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       }
     }
     if (event is UpdateItem) {
-      yield TransactionLoaded(
-          data: (state as TransactionLoaded).data.map((e) {
+      var data = (state as TransactionLoaded).data.map((e) {
         return e.id != event.item.id ? e : event.item;
-      }).toList());
+      }).toList();
+      yield TransactionLoading();
+      yield TransactionLoaded(data: data);
     }
     if (event is AddItem) {
       if (state is TransactionLoaded) {

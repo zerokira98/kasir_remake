@@ -36,6 +36,7 @@ dependencies:
   url_launcher: any
   equatable: any
   flutter_barcode_scanner: any
+  fl_chart: ^0.12.2
 
 dev_dependencies:
   flutter_test:

@@ -19,10 +19,16 @@ class DBHelper {
 
   test() async {
     Database database = await db;
-    // String sql = '''SELECT * FROM items WHERE NAMA LIKE ?''';
-    String sql = '''SELECT * FROM sqlite_master WHERE type=?''';
-    var result = await database.rawQuery(sql, ['table']);
-    print(result[4]);
+    String sql = '''SELECT * FROM items WHERE TGL_POSTING <= ?''';
+    // String sql = '''SELECT * FROM sqlite_master WHERE type=?''';
+    var result = await database.rawQuery(sql, [DateTime.now().toString()]);
+    print(DateTime.now().toString());
+    if (result.isNotEmpty) {
+      DateTime hei = DateTime.parse(result[0]['TGL_POSTING']);
+      print(hei);
+    }
+    var waht = DateTime.now().weekday;
+    print(waht);
   }
 
   addItem(List<ItemTr> data) async {
@@ -35,15 +41,24 @@ class DBHelper {
             .query('items', where: 'NAMA=?', whereArgs: [item.name]);
         if (check.isEmpty) {
           String sql =
-              '''INSERT INTO items(NAMA,HARGA_JUAL,JUMLAH,EXP_DATE) VALUES (?,?,?,?)''';
-          result = await database.rawInsert(sql,
-              [item.name, item.hargaJual, item.pcs, item.expdate.toString()]);
+              '''INSERT INTO items(NAMA,HARGA_JUAL,JUMLAH,EXP_DATE,BARCODE) VALUES (?,?,?,?,?)''';
+          result = await database.rawInsert(sql, [
+            item.name,
+            item.hargaJual,
+            item.pcs,
+            item.expdate.toString(),
+            item.barcode
+          ]);
         } else {
           var jumlah = check[0]['JUMLAH'] + item.pcs;
           String sql =
               '''UPDATE items set HARGA_JUAL=? ,JUMLAH=?,EXP_DATE=? WHERE ID=? ''';
-          await database.rawUpdate(
-              sql, [item.hargaJual, jumlah, item.expdate, check[0]['ID']]);
+          await database.rawUpdate(sql, [
+            item.hargaJual,
+            jumlah,
+            item.expdate.toString(),
+            check[0]['ID']
+          ]);
           result = check[0]['ID'];
         }
         String sql2 =
@@ -71,12 +86,20 @@ class DBHelper {
     print(result);
   }
 
-  showInsideItems([String query]) async {
+  Future<List> showInsideItems({String barcode, String query}) async {
     Database database = await db;
-    if (query == null) {
-      String sql = '''SELECT * FROM items''';
+    if (barcode != null) {
+      print('here dayo');
+      String sql = '''SELECT * FROM items WHERE CAST(BARCODE AS TEXT) LIKE ?''';
+      var result = await database.rawQuery(sql, ['$barcode%']);
+      print(result);
+      return result;
+    } else if (query == null && barcode == null) {
+      String sql =
+          '''SELECT * FROM items LEFT JOIN add_stock ON items.ID = add_stock.ID_BRG''';
       var result = await database.rawQuery(sql);
       print(result);
+      return result;
     } else if (query.length >= 2) {
       String sql = '''SELECT * FROM items WHERE NAMA LIKE ?''';
       var result = await database.rawQuery(sql, ['%$query%']);
@@ -93,6 +116,7 @@ class DBHelper {
       // `ID_LOG` int NOT NULL,
       await db.execute('''
         CREATE TABLE `add_stock` (
+      `ID` integer primary key autoincrement,
   `PRICE` decimal(10,0) NOT NULL,
   `QTY` int NOT NULL,
   `EXP` date DEFAULT NULL,
@@ -146,15 +170,17 @@ CREATE TABLE `tempat_beli` (
     return await deleteDatabase(path);
   }
 
-  Future<List> showInsideStock([int idbarang]) async {
+  Future<List> showInsideStock([int idbarang, bool showName]) async {
+    bool showname = showName ?? false;
     var result;
     String sql;
     Database database = await db;
     if (idbarang != null) {
       sql = '''SELECT * FROM add_stock WHERE ID_BRG=?''';
       result = await database.rawQuery(sql, [idbarang]);
-    } else {
-      sql = '''SELECT * FROM add_stock ''';
+    } else if (showname == true) {
+      sql =
+          '''SELECT * FROM add_stock LEFT JOIN items ON items.ID = add_stock.ID_BRG''';
       result = await database.rawQuery(sql);
     }
     print(result);
@@ -175,13 +201,23 @@ CREATE TABLE `tempat_beli` (
       }
     }
     var trInsert2 = await database.rawInsert(sql2);
+    print(trInsert2);
   }
 
   void insideTrans() async {
     Database database = await db;
-    // String sql = '''SELECT * FROM transaction''';
     String sql = '''SELECT * FROM transactions_items''';
+    String sql2 = '''SELECT * FROM transactions''';
+
     var a = await database.rawQuery(sql);
+    var b = await database.rawQuery(sql2);
+    print(b);
     print(a);
   }
+
+  // void historyStock()async {
+  //   Database database = await db;
+  //   String sql = '''SELECT * FROM add_stock''';
+
+  // }
 }
