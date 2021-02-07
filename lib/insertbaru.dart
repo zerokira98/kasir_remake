@@ -15,53 +15,126 @@ class _InsertProductPageState extends State<InsertProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Masuk Barang'),
-      ),
-      body: Container(
-        // padding: EdgeInsets.only(top: 12.0),
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        // color: Colors.grey[100],
-        child: SingleChildScrollView(
-          child: BlocBuilder<StockBloc, StockState>(
-            builder: (context, state) {
-              if (state is StockLoading) {
-                return Center(child: CircularProgressIndicator());
-              }
-              if (state is StockLoaded) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    for (int i = 0; i < state.data.length; i++)
-                      InsertProductCard(
-                          state.data[i], Key(state.data[i].id.toString())),
-                    RaisedButton(
-                      onPressed: () {
-                        BlocProvider.of<StockBloc>(context)
-                            .add(NewStockEntry());
-                        print('tambah\'ed');
-                      },
-                      child: Text('Tambah Item'),
-                    ),
-                    RaisedButton(
-                      onPressed: () {
-                        BlocProvider.of<StockBloc>(context)
-                            .add(UploadtoDB(state.data));
-                        // submit();
-                      },
-                      child: Text('Submit'),
-                    ),
-                  ],
-                );
-              }
-              return CircularProgressIndicator();
-            },
-          ),
+        appBar: AppBar(
+          title: Text('Masuk Barang'),
+          actions: [
+            InkWell(
+              onTap: () {
+                var state =
+                    (BlocProvider.of<StockBloc>(context).state as StockLoaded);
+
+                bool valids = state.data.every(
+                    (element) => element.formkey.currentState.validate());
+                if (valids) {
+                  print('valids');
+                  BlocProvider.of<StockBloc>(context)
+                      .add(UploadtoDB(state.data));
+                } else {
+                  print('not valid');
+                }
+              },
+              child: Container(
+                  // width: 56,
+                  // height: 56,
+
+                  margin: EdgeInsets.all(4.0),
+                  padding: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent[700],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    // mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Submit',
+                        textScaleFactor: 1.1,
+                        style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      Icon(
+                        Icons.subdirectory_arrow_right,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ],
+                  )),
+            ),
+          ],
         ),
-      ),
-    );
+        body: BlocListener<StockBloc, StockState>(
+          listener: (context, state) {
+            if (state is StockLoaded) {
+              if (state.error != null) {
+                Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text('Error : ${state.error['msg']}'),
+                ));
+              }
+            }
+          },
+          child: Container(
+            // padding: EdgeInsets.only(top: 12.0),
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            // color: Colors.grey[100],
+            child: SingleChildScrollView(
+              child: BlocBuilder<StockBloc, StockState>(
+                builder: (context, state) {
+                  if (state is StockLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (state is StockLoaded) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        for (int i = 0; i < state.data.length; i++)
+                          InsertProductCard(
+                              state.data[i], Key(state.data[i].id.toString())),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: RaisedButton(
+                                  elevation: 12.0,
+                                  color: Colors.redAccent,
+                                  onPressed: () {
+                                    BlocProvider.of<StockBloc>(context)
+                                        .add(NewStockEntry());
+                                    print('tambah\'ed');
+                                    // bool valids = state.data.any((element) =>
+                                    //     element.formkey.currentState
+                                    //         .validate());
+                                    // if (valids) {
+                                    //   print('valids');
+                                    //   BlocProvider.of<StockBloc>(context)
+                                    //       .add(UploadtoDB(state.data));
+                                    // } else {
+                                    //   print('not valid');
+                                    // }
+                                  },
+                                  child: Text(
+                                    'Tambah Item',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(24.0),
+                        )
+                      ],
+                    );
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+            ),
+          ),
+        ));
   }
 }
 
@@ -91,6 +164,8 @@ class _InsertProductCardState extends State<InsertProductCard>
   void initState() {
     sbc = SuggestionsBoxController();
     hargaBeli = TextEditingController();
+    BlocProvider.of<StockBloc>(context).add(
+        OnDataChanged(widget.data.copywith(formkey: _formkey, open: true)));
 
     super.initState();
   }
@@ -100,12 +175,19 @@ class _InsertProductCardState extends State<InsertProductCard>
     if (widget.data.name != namec.text) {
       namec.text = widget.data.name ?? '';
     }
+    if (widget.data.tempatBeli != placec.text) {
+      placec.text = widget.data.tempatBeli ?? '';
+    }
     if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
       hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
     }
     if (widget.data.hargaJual?.toString() != hargaJual.text) {
       hargaJual.text = widget.data.hargaJual?.toString() ?? '';
     }
+    if (widget.data.pcs?.toString() != qtyc.text) {
+      qtyc.text = widget.data.pcs?.toString() ?? '';
+    }
+    datec.text = widget.data.ditambahkan.toString().substring(0, 10);
     Widget bottom = Row(
       children: [
         Expanded(
@@ -116,6 +198,7 @@ class _InsertProductCardState extends State<InsertProductCard>
             // enabled: false,
             onTap: () async {
               FocusScope.of(context).unfocus();
+
               final DateTime picked = await showDatePicker(
                   context: context,
                   initialDate: selectedDate,
@@ -124,14 +207,14 @@ class _InsertProductCardState extends State<InsertProductCard>
                   lastDate: DateTime(2101));
               if (picked != null) {
                 datec.text = picked.toString().substring(0, 19);
-
-                BlocProvider.of<StockBloc>(context)
-                    .add(OnDataChanged(widget.data.copywith(expdate: picked)));
+                print(picked.toString());
+                BlocProvider.of<StockBloc>(context).add(
+                    OnDataChanged(widget.data.copywith(ditambahkan: picked)));
               }
               FocusScope.of(context).unfocus();
             },
             keyboardType: TextInputType.datetime,
-            decoration: InputDecoration(labelText: 'Expiration date'),
+            decoration: InputDecoration(labelText: 'Buy date'),
           ),
         )),
         Expanded(
@@ -154,18 +237,44 @@ class _InsertProductCardState extends State<InsertProductCard>
           ),
         ),
         Expanded(
-            child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: TextField(
-            controller: placec,
-            onChanged: (v) {
-              BlocProvider.of<StockBloc>(context).add(
-                  OnDataChanged(widget.data.copywith(tempatBeli: placec.text)));
-            },
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(labelText: 'Tempat pembelian'),
-          ),
-        )),
+          child: TypeAheadFormField(
+              textFieldConfiguration: TextFieldConfiguration(
+                controller: placec,
+                onChanged: (v) {
+                  BlocProvider.of<StockBloc>(context).add(OnDataChanged(
+                      widget.data.copywith(tempatBeli: placec.text)));
+                },
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(labelText: 'Tempat pembelian'),
+              ),
+              onSuggestionSelected: (val) {
+                BlocProvider.of<StockBloc>(context).add(OnDataChanged(
+                    widget.data.copywith(tempatBeli: val['NAMA'])));
+              },
+              itemBuilder: (context, datas) {
+                return ListTile(
+                  // leading: Icon(Icons.place),
+                  title: Text(datas['NAMA']),
+                  // subtitle: Text('\$${datas['HARGA_JUAL']}'),
+                );
+              },
+              suggestionsCallback: (data) {
+                return DBHelper.instance.showPlaces(query: data);
+              }),
+        ),
+        // Expanded(
+        //     child: Padding(
+        //   padding: const EdgeInsets.all(4.0),
+        //   child: TextField(
+        //     controller: placec,
+        //     onChanged: (v) {
+        //       BlocProvider.of<StockBloc>(context).add(
+        //           OnDataChanged(widget.data.copywith(tempatBeli: placec.text)));
+        //     },
+        //     keyboardType: TextInputType.text,
+        //     decoration: InputDecoration(labelText: 'Tempat pembelian'),
+        //   ),
+        // )),
       ],
     );
     Widget theForm = Form(
@@ -173,7 +282,7 @@ class _InsertProductCardState extends State<InsertProductCard>
       child: Stack(
         children: [
           Container(
-            margin: EdgeInsets.all(12.0),
+            margin: EdgeInsets.all(16.0),
             padding: EdgeInsets.all(8.00),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -181,8 +290,8 @@ class _InsertProductCardState extends State<InsertProductCard>
               boxShadow: [
                 BoxShadow(
                     spreadRadius: 0.0,
-                    blurRadius: 22.0,
-                    color: Colors.grey[500])
+                    blurRadius: 12.0,
+                    color: Colors.grey[400])
               ],
             ),
             child: Column(
@@ -191,7 +300,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                 Padding(
                   padding: EdgeInsets.all(4.0),
                   child: TypeAheadFormField(
-                    autovalidate: true,
+                    // autovalidate: true,
                     validator: (text) {
                       if (text.length <= 2) {
                         return '3 or more character';
@@ -228,7 +337,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                     },
                     onSuggestionSelected: (suggestion) async {
                       var res = await DBHelper.instance
-                          .showInsideStock(suggestion['ID']);
+                          .showInsideStock(idbarang: suggestion['ID']);
                       // print(res);
                       BlocProvider.of<StockBloc>(context)
                           .add(OnDataChanged(widget.data.copywith(
@@ -250,11 +359,14 @@ class _InsertProductCardState extends State<InsertProductCard>
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: TextFormField(
-                            autovalidateMode: AutovalidateMode.always,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             validator: (text) {
                               if (text.isNotEmpty &&
-                                  !RegExp(r'^[0-9]').hasMatch(text)) {
+                                  !RegExp(r'^[0-9]*$').hasMatch(text)) {
                                 return 'must be a number';
+                              } else if (text.isEmpty) {
+                                return 'tidak boleh kosong';
                               }
                               return null;
                             },
@@ -265,6 +377,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                               )));
                             },
                             controller: hargaBeli,
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                                 labelText: 'Harga beli per pcs'),
                           ),
@@ -272,7 +385,17 @@ class _InsertProductCardState extends State<InsertProductCard>
                     Expanded(
                         child: Padding(
                       padding: const EdgeInsets.all(4.0),
-                      child: TextField(
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (text) {
+                          if (text.isNotEmpty &&
+                              !RegExp(r'^[0-9]*$').hasMatch(text)) {
+                            return 'must be a number';
+                          } else if (text.isEmpty) {
+                            return 'tidak boleh kosong';
+                          }
+                          return null;
+                        },
                         // enabled: false,
                         controller: hargaJual,
 
@@ -281,6 +404,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                               widget.data.copywith(
                                   hargaJual: int.parse(hargaJual.text))));
                         },
+                        keyboardType: TextInputType.number,
                         decoration:
                             InputDecoration(labelText: 'Harga jual per pcs'),
                       ),
@@ -288,7 +412,17 @@ class _InsertProductCardState extends State<InsertProductCard>
                     Expanded(
                         child: Padding(
                       padding: const EdgeInsets.all(4.0),
-                      child: TextField(
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (text) {
+                          if (text.isNotEmpty &&
+                              !RegExp(r'^[0-9]*$').hasMatch(text)) {
+                            return 'must be a number';
+                          } else if (text.isEmpty) {
+                            return 'tidak boleh kosong';
+                          }
+                          return null;
+                        },
                         controller: qtyc,
                         onChanged: (v) {
                           BlocProvider.of<StockBloc>(context).add(OnDataChanged(
@@ -319,7 +453,7 @@ class _InsertProductCardState extends State<InsertProductCard>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.red.withOpacity(0.95),
+                  color: Colors.red.withOpacity(0.9),
                 ),
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(8.0),
@@ -328,37 +462,27 @@ class _InsertProductCardState extends State<InsertProductCard>
                   color: Colors.white,
                 ),
               ),
-              // highlightColor: Colors.green,
-              // splashColor: Colors.green,
-              // focusColor: Colors.red,
             ),
           ),
         ],
       ),
     );
 
-    return AnimatedSize(
-      duration: Duration(milliseconds: 450),
-      vsync: this,
-      curve: Curves.ease,
-      child: widget.data.open
-          ? AnimatedOpacity(
-              duration: Duration(milliseconds: 400),
-              opacity: widget.data.open ? 1.0 : 0.0,
-              child: theForm,
-            )
-          : Container(
-              height: 0,
-              child: AnimatedOpacity(
-                duration: Duration(milliseconds: 400),
-                opacity: widget.data.open ? 0.0 : 1.0,
-                child: theForm,
-              ),
-            ),
+    return Container(
+      // height: 1,
+      child: AnimatedClipRect(
+        curve: Curves.ease,
+        reverseCurve: Curves.ease,
+        duration: Duration(milliseconds: 450),
+        horizontalAnimation: false,
+        open: widget.data.open,
+        child: theForm,
+      ),
     );
   }
 
   validate(name, priceBuy, priceSell, qty, place, expdate) {
+    // _formkey.currentState.validate();
     // if (name.legth == 0)
     //   return {'error': ERROR.NAME, 'error_msg': 'invalid Name'};
   }
@@ -380,4 +504,80 @@ class _InsertProductCardState extends State<InsertProductCard>
   //   );
   // BlocProvider.of<StockBloc>(context).add(UploadtoDB(dataFinal));
   // }
+}
+
+class AnimatedClipRect extends StatefulWidget {
+  @override
+  _AnimatedClipRectState createState() => _AnimatedClipRectState();
+
+  final Widget child;
+  final bool open;
+  final bool horizontalAnimation;
+  final bool verticalAnimation;
+  final Alignment alignment;
+  final Duration duration;
+  final Duration reverseDuration;
+  final Curve curve;
+  final Curve reverseCurve;
+
+  ///The behavior of the controller when [AccessibilityFeatures.disableAnimations] is true.
+  final AnimationBehavior animationBehavior;
+
+  AnimatedClipRect({
+    this.child,
+    this.open,
+    this.horizontalAnimation = true,
+    this.verticalAnimation = true,
+    this.alignment = Alignment.center,
+    this.duration,
+    this.reverseDuration,
+    this.curve = Curves.linear,
+    this.reverseCurve,
+    this.animationBehavior = AnimationBehavior.normal,
+  });
+}
+
+class _AnimatedClipRectState extends State<AnimatedClipRect>
+    with TickerProviderStateMixin {
+  AnimationController _animationController;
+  Animation _animation;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+        duration: widget.duration ?? const Duration(milliseconds: 500),
+        reverseDuration: widget.reverseDuration ??
+            (widget.duration ?? const Duration(milliseconds: 500)),
+        vsync: this,
+        value: widget.open ? 1.0 : 0.0,
+        animationBehavior: widget.animationBehavior);
+    _animation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: widget.curve,
+      reverseCurve: widget.reverseCurve ?? widget.curve,
+    ));
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    widget.open
+        ? _animationController.forward()
+        : _animationController.reverse();
+
+    return ClipRect(
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (_, child) {
+          return Align(
+            alignment: widget.alignment,
+            heightFactor: widget.verticalAnimation ? _animation.value : 1.0,
+            widthFactor: widget.horizontalAnimation ? _animation.value : 1.0,
+            child: child,
+          );
+        },
+        child: widget.child,
+      ),
+    );
+  }
 }

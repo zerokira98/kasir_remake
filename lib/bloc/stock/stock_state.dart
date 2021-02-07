@@ -12,10 +12,14 @@ class StockLoading extends StockState {}
 
 class StockLoaded extends StockState {
   final List<ItemTr> data;
-  StockLoaded(this.data);
+  final Map error;
+  StockLoaded(this.data, {this.error});
   @override
-  // TODO: implement props
-  List<Object> get props => [data];
+  List<Object> get props => [data, error];
+  @override
+  String toString() {
+    return 'length : ${data}';
+  }
 }
 
 class StockError extends StockState {}

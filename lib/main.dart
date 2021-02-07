@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/bloc/stock/stock_bloc.dart';
+import 'package:kasir_remake/bloc/stock_view/stockview_bloc.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
 import 'package:kasir_remake/insertbaru.dart';
 import 'package:kasir_remake/msc/bloc_observer.dart';
@@ -28,10 +29,14 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => StockBloc(),
-        )
+        ),
+        BlocProvider(
+          create: (context) => StockviewBloc(),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.android: CupertinoPageTransitionsBuilder()
@@ -80,8 +85,7 @@ class _HomePageState extends State<HomePage> {
               BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
               // BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
               BottomNavigationBarItem(icon: Icon(Icons.phone), label: 'Pulsa'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.fire_extinguisher), label: 'debug'),
+              BottomNavigationBarItem(icon: Icon(Icons.list), label: 'More'),
             ]),
         body: Column(
           children: [

@@ -1,16 +1,19 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 class ItemTr extends Equatable {
   final String name;
   final int hargaBeli;
   final int hargaJual;
   final int pcs;
+  final GlobalKey<FormState> formkey;
   final int productId;
   final String tempatBeli;
   final String barcode;
   final int id;
   final bool open;
   final DateTime expdate;
+  final DateTime ditambahkan;
 
   ItemTr(
       {this.name,
@@ -18,10 +21,12 @@ class ItemTr extends Equatable {
       this.productId,
       this.hargaJual,
       this.pcs,
+      this.formkey,
       String barcode,
       String tempatBeli,
       this.open,
       this.expdate,
+      this.ditambahkan,
       int id})
       : this.id = id,
         this.barcode = barcode,
@@ -34,15 +39,19 @@ class ItemTr extends Equatable {
       String tempatBeli,
       int productId,
       bool open,
+      GlobalKey<FormState> formkey,
       String barcode,
       DateTime expdate,
+      DateTime ditambahkan,
       int id}) {
     return ItemTr(
         barcode: barcode ?? this.barcode,
         open: open ?? this.open,
         name: name ?? this.name,
+        formkey: formkey ?? this.formkey,
         productId: productId ?? this.productId,
         expdate: expdate ?? this.expdate,
+        ditambahkan: ditambahkan ?? this.ditambahkan,
         hargaBeli: hargaBeli ?? this.hargaBeli,
         hargaJual: hargaJual ?? this.hargaJual,
         pcs: pcs ?? this.pcs,
@@ -61,12 +70,15 @@ class ItemTr extends Equatable {
         open,
         expdate,
         barcode,
-        productId
+        productId,
+        ditambahkan,
+        formkey
       ];
 
   @override
   String toString() {
-    return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual, 
-    $pcs, $tempatBeli, $id, $expdate, $barcode,$productId}''';
+    return 'open : $open';
+    // return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual,
+    // $pcs, $tempatBeli, $id, $expdate, $barcode,$productId}''';
   }
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:kasir_remake/msc/db.dart';
 import 'package:kasir_remake/model/item_tr.dart';
 import 'package:meta/meta.dart';
@@ -15,6 +16,9 @@ class StockBloc extends Bloc<StockEvent, StockState> {
     ///do smg
     add(StockInitialize());
   }
+  verify(List<ItemTr> data) {
+    return data.any((e) => e.name != null);
+  }
 
   @override
   Stream<StockState> mapEventToState(
@@ -25,15 +29,18 @@ class StockBloc extends Bloc<StockEvent, StockState> {
         yield StockLoaded([
           ItemTr(
               id: Random().nextInt(510),
+              // formkey: GlobalKey<FormState>(),
+              ditambahkan: DateTime.now().toUtc(),
               expdate: DateTime.now().add(Duration(days: 690)),
               open: false)
         ]);
-        await Future.delayed(Duration(milliseconds: 500));
 
-        yield StockLoaded((state as StockLoaded)
-            .data
-            .map((e) => e.copywith(open: true))
-            .toList());
+        // await Future.delayed(Duration(milliseconds: 500));
+
+        // yield StockLoaded((state as StockLoaded)
+        //     .data
+        //     .map((e) => e.copywith(open: true))
+        //     .toList());
       }
     }
     if (state is StockLoaded) {
@@ -45,28 +52,34 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       }
       if (event is UploadtoDB) {
         var data = (state as StockLoaded).data;
+        // verify(data);
+        // if (data.any((e) => e.formkey.currentState.validate())) {
+        //   yield StockLoaded(data, error: {'msg': 'data tidak valid'});
+        //   await Future.delayed(Duration(seconds: 4));
+        //   yield StockLoaded(data, error: null);
+        // } else {
         yield (StockLoading());
         await Future.delayed(Duration(seconds: 1));
         try {
           await DBHelper.instance.addItem(data);
-          print('here1');
           yield StockInitial();
-          print('here2');
           add(StockInitialize());
         } catch (e) {
-          print(e);
+          yield StockLoaded(data, error: {'msg': e.toString()});
         }
+        // }
       }
       if (event is NewStockEntry) {
         yield StockLoaded((state as StockLoaded).data +
             [
               ItemTr(
                   id: Random().nextInt(510),
+                  ditambahkan: DateTime.now().toUtc(),
                   expdate: DateTime.now().add(Duration(days: 690)),
                   open: false)
             ]);
 
-        await Future.delayed(Duration(milliseconds: 500));
+        await Future.delayed(Duration(milliseconds: 100));
         yield StockLoaded((state as StockLoaded)
             .data
             .map((e) => e.open == false ? e.copywith(open: true) : e)
@@ -78,7 +91,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
             .map((e) => e.id == event.item.id ? e.copywith(open: false) : e)
             .toList());
 
-        await Future.delayed(Duration(milliseconds: 500));
+        await Future.delayed(Duration(milliseconds: 550));
         yield StockLoaded(
           (state as StockLoaded)
               .data

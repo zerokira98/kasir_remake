@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/bloc/stock/stock_bloc.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
+import 'package:kasir_remake/main.dart';
 
 class CheckOutTr extends StatelessWidget {
   @override
@@ -12,6 +13,10 @@ class CheckOutTr extends StatelessWidget {
         listener: (context, state) {
           if (state is TransactionInitial) {
             Navigator.pop(context);
+            // Navigator.pushAndRemoveUntil(
+            //     context,
+            //     MaterialPageRoute(builder: (context) => HomePage()),
+            //     ModalRoute.withName('/'));
           }
         },
         child: BlocBuilder<TransactionBloc, TransactionState>(
