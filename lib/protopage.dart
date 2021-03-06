@@ -89,7 +89,7 @@ class _MainsState extends State<Mains> with SingleTickerProviderStateMixin {
 }
 
 class Mains1 extends StatelessWidget {
-  PageController pc = PageController();
+  final PageController pc = PageController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,10 +117,8 @@ class Mains1 extends StatelessWidget {
 
 class PageA extends StatefulWidget {
   final PageController pc;
-  int index;
-  PageA({this.pc, int index}) {
-    this.index = index;
-  }
+  final int index;
+  PageA({this.pc, int index}) : this.index = index;
 
   @override
   _PageAState createState() => _PageAState();
@@ -162,10 +160,10 @@ class _PageAState extends State<PageA> {
 
   @override
   Widget build(BuildContext context) {
-    var maxoffset = 22 /
-        7 *
-        MediaQuery.of(context).size.width /
-        (MediaQuery.of(context).size.width * 4);
+    // var maxoffset = 22 /
+    //     7 *
+    //     MediaQuery.of(context).size.width /
+    //     (MediaQuery.of(context).size.width * 4);
     return AnimatedContainer(
       color: Colors.blue,
       margin: margin,

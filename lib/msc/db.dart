@@ -141,7 +141,7 @@ CREATE TABLE `tempat_beli` (
             item.barcode
           ]);
         } else {
-          var jumlah = checkItem[0]['JUMLAH'] + item.pcs;
+          var jumlah = (checkItem[0]['JUMLAH'] as int) + item.pcs;
           String sql =
               '''UPDATE items set HARGA_JUAL=? ,JUMLAH=?,EXP_DATE=? WHERE ID=? ''';
           await database.rawUpdate(sql, [
@@ -271,6 +271,7 @@ CREATE TABLE `tempat_beli` (
         print(e);
       }
     }
+    return null;
   }
 
   Future transaction(List<ItemTr> data) async {

@@ -200,7 +200,8 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
                                   Clipboard.setData(
                                       ClipboardData(text: kodeController.text));
                                   // ClipboardData(text: kodeController.text);
-                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
                                     content: Text('Code Copied'),
                                   ));
                                   print('pressed');

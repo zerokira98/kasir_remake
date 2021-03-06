@@ -16,6 +16,5 @@ class ItemStk extends Equatable {
       this.id});
 
   @override
-  // TODO: implement props
   List<Object> get props => [];
 }
