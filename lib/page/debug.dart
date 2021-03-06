@@ -87,7 +87,20 @@ class DebugPage extends StatelessWidget {
           ElevatedButton(
             child: Text('Test terminal'),
             onPressed: () {
-              DBHelper.instance.showPlaces(query: 'pu');
+              Map a = {
+                'abc': {
+                  'def': {'def1', 'def2', 'def3'},
+                  'ghi': {'ghi1', 'ghi2'}
+                }
+              };
+              for (var b in a['abc'].values) {
+                print(b);
+              }
+              // a['abc'].forEach((key, value) {
+              //   print('key :' + key);
+              //   print('value :' + value.toString());
+              // });
+              // DBHelper.instance.showPlaces();
               // print(DateTime.now());
               // Navigator.push(
               //     context,

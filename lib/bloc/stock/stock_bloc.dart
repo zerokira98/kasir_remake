@@ -14,7 +14,7 @@ part 'stock_state.dart';
 class StockBloc extends Bloc<StockEvent, StockState> {
   StockBloc() : super(StockInitial()) {
     ///do smg
-    add(StockInitialize());
+    add(StockInitialize(success: false));
   }
   verify(List<ItemTr> data) {
     return data.any((e) => e.name != null);
@@ -33,8 +33,10 @@ class StockBloc extends Bloc<StockEvent, StockState> {
               ditambahkan: DateTime.now().toUtc(),
               expdate: DateTime.now().add(Duration(days: 690)),
               open: false)
-        ]);
-
+        ], success: event.success);
+        await Future.delayed(Duration(seconds: 1), () async* {
+          yield (state as StockLoaded).clearMsg();
+        });
         // await Future.delayed(Duration(milliseconds: 500));
 
         // yield StockLoaded((state as StockLoaded)
@@ -63,18 +65,27 @@ class StockBloc extends Bloc<StockEvent, StockState> {
         try {
           await DBHelper.instance.addItem(data);
           yield StockInitial();
-          add(StockInitialize());
+          add(StockInitialize(success: true));
         } catch (e) {
           yield StockLoaded(data, error: {'msg': e.toString()});
+          await Future.delayed(Duration(seconds: 1));
+          yield (state as StockLoaded).clearMsg();
         }
         // }
       }
       if (event is NewStockEntry) {
+        var prevData = (state as StockLoaded).data;
+        DateTime Function() ditambahkan = () {
+          if (prevData.isNotEmpty) {
+            return prevData.last.ditambahkan;
+          }
+          return DateTime.now().toUtc();
+        };
         yield StockLoaded((state as StockLoaded).data +
             [
               ItemTr(
                   id: Random().nextInt(510),
-                  ditambahkan: DateTime.now().toUtc(),
+                  ditambahkan: ditambahkan(),
                   expdate: DateTime.now().add(Duration(days: 690)),
                   open: false)
             ]);

@@ -66,8 +66,13 @@ class _InsertProductPageState extends State<InsertProductPage> {
           listener: (context, state) {
             if (state is StockLoaded) {
               if (state.error != null) {
-                Scaffold.of(context).showSnackBar(SnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Error : ${state.error['msg']}'),
+                ));
+              }
+              if (state.success != null && state.success) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Berhasil'),
                 ));
               }
             }
@@ -96,13 +101,17 @@ class _InsertProductPageState extends State<InsertProductPage> {
                           child: Row(
                             children: [
                               Expanded(
-                                child: RaisedButton(
-                                  elevation: 12.0,
-                                  color: Colors.redAccent,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                      // elevation: 12.0,
+
+                                      ),
+                                  // color: Colors.redAccent,
                                   onPressed: () {
                                     BlocProvider.of<StockBloc>(context)
                                         .add(NewStockEntry());
                                     print('tambah\'ed');
+                                    FocusScope.of(context).unfocus();
                                     // bool valids = state.data.any((element) =>
                                     //     element.formkey.currentState
                                     //         .validate());
@@ -258,8 +267,14 @@ class _InsertProductCardState extends State<InsertProductCard>
                   // subtitle: Text('\$${datas['HARGA_JUAL']}'),
                 );
               },
-              suggestionsCallback: (data) {
-                return DBHelper.instance.showPlaces(query: data);
+              suggestionsCallback: (data) async {
+                var vals = await DBHelper.instance.showPlaces(query: data);
+                List newvals = [];
+                vals.forEach((element) {
+                  newvals.add(element);
+                });
+                newvals.removeWhere((element) => element['NAMA'] == '');
+                return newvals;
               }),
         ),
         // Expanded(
@@ -300,7 +315,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                 Padding(
                   padding: EdgeInsets.all(4.0),
                   child: TypeAheadFormField(
-                    // autovalidate: true,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    // autovalidate: ,
                     validator: (text) {
                       if (text.length <= 2) {
                         return '3 or more character';
@@ -447,6 +463,7 @@ class _InsertProductCardState extends State<InsertProductCard>
             top: 8,
             child: InkWell(
               onTap: () {
+                FocusScope.of(context).unfocus();
                 BlocProvider.of<StockBloc>(context)
                     .add(DeleteEntry(widget.data));
               },

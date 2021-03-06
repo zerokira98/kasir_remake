@@ -3,12 +3,18 @@ import 'package:fl_chart/fl_chart.dart';
 
 enum WeekDays { Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday }
 
-class Stats extends StatelessWidget {
+class Stats extends StatefulWidget {
   // LineChartBarData barData = LineChartBarData(spots: [
   //   FlSpot(0, 1),
   //   FlSpot(1, 2),
   //   FlSpot(2, 3),
   // ]);
+  @override
+  _StatsState createState() => _StatsState();
+}
+
+class _StatsState extends State<Stats> {
+  var spotsValue;
   var spots = [
     FlSpot(0, 1),
     FlSpot(1, 2),
@@ -18,6 +24,26 @@ class Stats extends StatelessWidget {
     FlSpot(5, 0),
     FlSpot(6, 4),
   ];
+  var defaultSpots = [
+    FlSpot(0, 1),
+    FlSpot(1, 1),
+    FlSpot(2, 1),
+    FlSpot(3, 1),
+    FlSpot(4, 1),
+    FlSpot(5, 1),
+    FlSpot(6, 1),
+  ];
+  @override
+  void initState() {
+    spotsValue = defaultSpots;
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        spotsValue = spots;
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     LineChartData data = LineChartData(
@@ -67,7 +93,7 @@ class Stats extends StatelessWidget {
           colors: [
             Colors.lightBlue[300],
           ],
-          spots: spots,
+          spots: spotsValue,
         ),
       ],
     );
@@ -104,7 +130,10 @@ class Stats extends StatelessWidget {
                         child: Container(
                       height: 200,
                       padding: const EdgeInsets.only(right: 20.0),
-                      child: LineChart(data),
+                      child: LineChart(
+                        data,
+                        swapAnimationDuration: Duration(milliseconds: 400),
+                      ),
                     )),
                   ],
                 ),

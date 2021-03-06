@@ -72,7 +72,7 @@ CREATE TABLE `tempat_beli` (
   `NAMA` varchar(50) NOT NULL,
   `DESC` varchar(64) NULL
 );''');
-      await db.insert('tempat_beli', {'NAMA': 'Empty'});
+      await db.insert('tempat_beli', {'NAMA': '', 'DESC': 'Diisi Kosong'});
     });
     // return a;
     // } catch (e) {
@@ -109,6 +109,17 @@ CREATE TABLE `tempat_beli` (
     print('lewat cosedb');
   }
 
+  Future<int> updateItem(
+      int idBrg, String nama, int hargaJual, int barcode) async {
+    Database database = await db;
+    Map<String, dynamic> values = Map<String, dynamic>();
+    if (nama != null) values.addAll({'NAMA': nama});
+    if (hargaJual != null) values.addAll({'HARGA_JUAL': hargaJual});
+    if (barcode != null) values.addAll({'BARCODE': barcode});
+
+    return database.update('items', values, where: 'ID=?', whereArgs: [idBrg]);
+  }
+
   addItem(List<ItemTr> data) async {
     Database database = await db;
     try {
@@ -143,8 +154,8 @@ CREATE TABLE `tempat_beli` (
         }
 
         var checkPlace = await database.query('tempat_beli',
-            where: 'NAMA=?', whereArgs: [item.tempatBeli]);
-        int placeId = 0;
+            where: 'NAMA=?', whereArgs: [item.tempatBeli ?? '']);
+        int placeId = 1;
         if (checkPlace.isEmpty) {
           placeId =
               await database.insert('tempat_beli', {'NAMA': item.tempatBeli});
@@ -194,6 +205,7 @@ CREATE TABLE `tempat_beli` (
           GROUP BY items.NAMA 
           ORDER BY items.NAMA
           ''';
+      // LEFT JOIN tempat_beli ON tempat_beli.ID = add_stock
       // ORDER_BY items.NAMA
       var result = await database.rawQuery(sql);
       print(result);
@@ -242,18 +254,19 @@ CREATE TABLE `tempat_beli` (
   }
 
   Future<List> showPlaces({String query}) async {
+    print('hajime');
     query = query ?? '';
     var database = await db;
-    if (query.length > 2) {
+    if (query.length > 1 || query == '') {
       try {
         print('%' + query + '%');
-        var result = await database.query('tempat_beli',
+        var results = await database.query('tempat_beli',
             where: 'NAMA LIKE ? ',
             whereArgs: ['%$query%']).catchError((onError) {
           print(onError);
         });
-        print(result);
-        return result;
+        print(results);
+        return results;
       } on DatabaseException catch (e) {
         print(e);
       }

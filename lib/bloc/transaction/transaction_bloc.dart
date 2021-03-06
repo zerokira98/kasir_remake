@@ -3,10 +3,9 @@ import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/semantics.dart';
+// import 'package:flutter/semantics.dart';
 import 'package:kasir_remake/msc/db.dart';
 import 'package:kasir_remake/model/item_tr.dart';
-import 'dart:math' as math;
 import 'package:meta/meta.dart';
 // import '';
 

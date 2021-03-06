@@ -495,7 +495,7 @@ class FilterBox extends StatelessWidget {
                           // dropdownValue = v;
                         }),
                     Expanded(
-                      child: RaisedButton(
+                      child: ElevatedButton(
                         onPressed: () {
                           // print(namaBarang.text + dateFromFull + dateToFull);
                           BlocProvider.of<StockviewBloc>(context)
