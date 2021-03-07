@@ -202,12 +202,9 @@ class _InsertProductCardState extends State<InsertProductCard>
         Expanded(
             child: Padding(
           padding: const EdgeInsets.all(4.0),
-          child: TextField(
-            controller: datec,
-            // enabled: false,
+          child: InkWell(
             onTap: () async {
               FocusScope.of(context).unfocus();
-
               final DateTime picked = await showDatePicker(
                   context: context,
                   initialDate: selectedDate,
@@ -220,10 +217,19 @@ class _InsertProductCardState extends State<InsertProductCard>
                 BlocProvider.of<StockBloc>(context).add(
                     OnDataChanged(widget.data.copywith(ditambahkan: picked)));
               }
-              FocusScope.of(context).unfocus();
             },
-            keyboardType: TextInputType.datetime,
-            decoration: InputDecoration(labelText: 'Buy date'),
+            child: TextField(
+              controller: datec,
+              // enabled: false,
+              enabled: false,
+              onTap: () async {
+                FocusScope.of(context).unfocus();
+
+                FocusScope.of(context).unfocus();
+              },
+              keyboardType: TextInputType.datetime,
+              decoration: InputDecoration(labelText: 'Buy date'),
+            ),
           ),
         )),
         Expanded(
@@ -270,10 +276,13 @@ class _InsertProductCardState extends State<InsertProductCard>
               suggestionsCallback: (data) async {
                 var vals = await DBHelper.instance.showPlaces(query: data);
                 List newvals = [];
-                vals.forEach((element) {
-                  newvals.add(element);
-                });
-                newvals.removeWhere((element) => element['NAMA'] == '');
+                if (vals.isNotEmpty) {
+                  vals.forEach((element) {
+                    newvals.add(element);
+                  });
+                  newvals.removeWhere((element) => element['NAMA'] == '');
+                  return newvals;
+                }
                 return newvals;
               }),
         ),

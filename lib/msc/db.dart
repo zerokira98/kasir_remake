@@ -257,12 +257,17 @@ CREATE TABLE `tempat_beli` (
     print('hajime');
     query = query ?? '';
     var database = await db;
-    if (query.length > 1 || query == '') {
+    if (query.length >= 1 || query == '') {
       try {
         print('%' + query + '%');
-        var results = await database.query('tempat_beli',
-            where: 'NAMA LIKE ? ',
-            whereArgs: ['%$query%']).catchError((onError) {
+        var results = await database
+            .query(
+          'tempat_beli',
+          where: 'NAMA LIKE ? ',
+          whereArgs: ['%$query%'],
+          limit: 10,
+        )
+            .catchError((onError) {
           print(onError);
         });
         print(results);
@@ -271,7 +276,7 @@ CREATE TABLE `tempat_beli` (
         print(e);
       }
     }
-    return null;
+    return [];
   }
 
   Future transaction(List<ItemTr> data) async {

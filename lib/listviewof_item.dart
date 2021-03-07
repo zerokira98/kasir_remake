@@ -310,35 +310,58 @@ class ListOfStockItems extends StatelessWidget {
                       var hargaJual = numFormat.format(data.hargaJual);
                       var totalBeli =
                           numFormat.format(data.pcs * data.hargaBeli);
-                      return Container(
-                        margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          // border: Border.all(),
-                          boxShadow: [
-                            BoxShadow(blurRadius: 8, color: Colors.black26),
-                          ],
-                          color: Colors.white,
-                        ),
-                        child: ListTile(
-                          isThreeLine: true,
-                          // shape: RoundedRectangleBorder( ),
-                          // tileColor: Colors.white,
-                          title: Text(state.data[i].name.toString()),
-                          subtitle: Row(
-                            children: [
-                              Text('Tempat beli: ${data.tempatBeli}' +
-                                  '\nTanggal beli : ${data.ditambahkan.toString().substring(0, 10)}' +
-                                  '\nJumlah item : ${data.pcs}pcs'),
+                      return Column(
+                        children: [
+                          if (i >= 1 &&
+                              data.ditambahkan.toString().substring(0, 10) !=
+                                  state.data[i - 1].ditambahkan
+                                      .toString()
+                                      .substring(0, 10))
+                            Row(children: [
                               Expanded(
-                                child: Container(),
+                                child: Container(
+                                  padding: EdgeInsets.all(8.0),
+                                  margin: EdgeInsets.only(bottom: 8.0),
+                                  color: Colors.grey[700],
+                                  child: Text(
+                                    data.ditambahkan.toString(),
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              )
+                            ]),
+                          Container(
+                            margin:
+                                EdgeInsets.only(bottom: 8, left: 8, right: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              // border: Border.all(),
+                              boxShadow: [
+                                BoxShadow(blurRadius: 8, color: Colors.black26),
+                              ],
+                              color: Colors.white,
+                            ),
+                            child: ListTile(
+                              isThreeLine: true,
+                              // shape: RoundedRectangleBorder( ),
+                              // tileColor: Colors.white,
+                              title: Text(state.data[i].name.toString()),
+                              subtitle: Row(
+                                children: [
+                                  Text('Tempat beli: ${data.tempatBeli}' +
+                                      '\nTanggal beli : ${data.ditambahkan.toString().substring(0, 10)}' +
+                                      '\nJumlah item : ${data.pcs}pcs'),
+                                  Expanded(
+                                    child: Container(),
+                                  ),
+                                  Text(
+                                      'Harga jual : $hargaJual \nHarga beli : $hargaBeli' +
+                                          '\nTotal beli : $totalBeli')
+                                ],
                               ),
-                              Text(
-                                  'Harga jual : $hargaJual \nHarga beli : $hargaBeli' +
-                                      '\nTotal beli : $totalBeli')
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       );
                     },
                     itemCount: state.data.length,
