@@ -24,7 +24,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                     (BlocProvider.of<StockBloc>(context).state as StockLoaded);
 
                 bool valids = state.data.every(
-                    (element) => element.formkey.currentState.validate());
+                    (element) => element.formkey!.currentState!.validate());
                 if (valids) {
                   print('valids');
                   BlocProvider.of<StockBloc>(context)
@@ -67,10 +67,10 @@ class _InsertProductPageState extends State<InsertProductPage> {
             if (state is StockLoaded) {
               if (state.error != null) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Error : ${state.error['msg']}'),
+                  content: Text('Error : ${state.error!['msg']}'),
                 ));
               }
-              if (state.success != null && state.success) {
+              if (state.success != null && state.success!) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Berhasil'),
                 ));
@@ -159,8 +159,8 @@ class InsertProductCard extends StatefulWidget {
 
 class _InsertProductCardState extends State<InsertProductCard>
     with TickerProviderStateMixin {
-  SuggestionsBoxController sbc;
-  TextEditingController namec = TextEditingController(),
+  SuggestionsBoxController? sbc;
+  TextEditingController? namec = TextEditingController(),
       hargaBeli,
       hargaJual = TextEditingController(),
       datec = TextEditingController(),
@@ -181,22 +181,22 @@ class _InsertProductCardState extends State<InsertProductCard>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.name != namec.text) {
-      namec.text = widget.data.name ?? '';
+    if (widget.data.name != namec!.text) {
+      namec!.text = widget.data.name ?? '';
     }
-    if (widget.data.tempatBeli != placec.text) {
-      placec.text = widget.data.tempatBeli ?? '';
+    if (widget.data.tempatBeli != placec!.text) {
+      placec!.text = widget.data.tempatBeli ?? '';
     }
-    if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
-      hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
+    if (widget.data.hargaBeli?.toString() != hargaBeli!.text) {
+      hargaBeli!.text = widget.data.hargaBeli?.toString() ?? '';
     }
-    if (widget.data.hargaJual?.toString() != hargaJual.text) {
-      hargaJual.text = widget.data.hargaJual?.toString() ?? '';
+    if (widget.data.hargaJual?.toString() != hargaJual!.text) {
+      hargaJual!.text = widget.data.hargaJual?.toString() ?? '';
     }
-    if (widget.data.pcs?.toString() != qtyc.text) {
-      qtyc.text = widget.data.pcs?.toString() ?? '';
+    if (widget.data.pcs?.toString() != qtyc!.text) {
+      qtyc!.text = widget.data.pcs?.toString() ?? '';
     }
-    datec.text = widget.data.ditambahkan.toString().substring(0, 10);
+    datec!.text = widget.data.ditambahkan.toString().substring(0, 10);
     Widget bottom = Row(
       children: [
         Expanded(
@@ -205,14 +205,14 @@ class _InsertProductCardState extends State<InsertProductCard>
           child: InkWell(
             onTap: () async {
               FocusScope.of(context).unfocus();
-              final DateTime picked = await showDatePicker(
+              final DateTime? picked = await showDatePicker(
                   context: context,
                   initialDate: selectedDate,
                   initialDatePickerMode: DatePickerMode.day,
                   firstDate: DateTime(2020),
                   lastDate: DateTime(2101));
               if (picked != null) {
-                datec.text = picked.toString().substring(0, 19);
+                datec!.text = picked.toString().substring(0, 19);
                 print(picked.toString());
                 BlocProvider.of<StockBloc>(context).add(
                     OnDataChanged(widget.data.copywith(ditambahkan: picked)));
@@ -243,7 +243,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                           await FlutterBarcodeScanner.scanBarcode(
                               '#ffffff', 'Cancel', false, ScanMode.BARCODE);
                       print(barcodeScan);
-                      barcodeC.text = barcodeScan;
+                      barcodeC!.text = barcodeScan;
 
                       BlocProvider.of<StockBloc>(context).add(OnDataChanged(
                           widget.data.copywith(barcode: barcodeScan)));
@@ -257,16 +257,16 @@ class _InsertProductCardState extends State<InsertProductCard>
                 controller: placec,
                 onChanged: (v) {
                   BlocProvider.of<StockBloc>(context).add(OnDataChanged(
-                      widget.data.copywith(tempatBeli: placec.text)));
+                      widget.data.copywith(tempatBeli: placec!.text)));
                 },
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(labelText: 'Tempat pembelian'),
               ),
-              onSuggestionSelected: (val) {
+              onSuggestionSelected: (dynamic val) {
                 BlocProvider.of<StockBloc>(context).add(OnDataChanged(
                     widget.data.copywith(tempatBeli: val['NAMA'])));
               },
-              itemBuilder: (context, datas) {
+              itemBuilder: (context, dynamic datas) {
                 return ListTile(
                   // leading: Icon(Icons.place),
                   title: Text(datas['NAMA']),
@@ -274,7 +274,9 @@ class _InsertProductCardState extends State<InsertProductCard>
                 );
               },
               suggestionsCallback: (data) async {
-                var vals = await DBHelper.instance.showPlaces(query: data);
+                var vals =
+                    await RepositoryProvider.of<DatabaseRepository>(context)
+                        .showPlaces(query: data);
                 List newvals = [];
                 if (vals.isNotEmpty) {
                   vals.forEach((element) {
@@ -315,7 +317,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                 BoxShadow(
                     spreadRadius: 0.0,
                     blurRadius: 12.0,
-                    color: Colors.grey[400])
+                    color: Colors.grey[400]!)
               ],
             ),
             child: Column(
@@ -327,7 +329,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     // autovalidate: ,
                     validator: (text) {
-                      if (text.length <= 2) {
+                      if (text!.length <= 2) {
                         return '3 or more character';
                       }
                       return null;
@@ -338,7 +340,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                         onChanged: (v) {
                           BlocProvider.of<StockBloc>(context)
                               .add(OnDataChanged(widget.data.copywith(
-                            name: namec.text,
+                            name: namec!.text,
                           )));
                         },
                         style: DefaultTextStyle.of(context)
@@ -348,20 +350,22 @@ class _InsertProductCardState extends State<InsertProductCard>
                             border: OutlineInputBorder(),
                             labelText: 'Nama item')),
                     suggestionsCallback: (pattern) async {
-                      var res = await DBHelper.instance
+                      var res = await RepositoryProvider.of<DatabaseRepository>(
+                              context)
                           .showInsideItems(query: pattern);
                       return res;
                       // return await BackendService.getSuggestions(pattern);
                     },
-                    itemBuilder: (context, suggestion) {
+                    itemBuilder: (context, dynamic suggestion) {
                       return ListTile(
                         leading: Icon(Icons.shopping_cart),
                         title: Text(suggestion['NAMA']),
                         subtitle: Text('\$${suggestion['HARGA_JUAL']}'),
                       );
                     },
-                    onSuggestionSelected: (suggestion) async {
-                      var res = await DBHelper.instance
+                    onSuggestionSelected: (dynamic suggestion) async {
+                      var res = await RepositoryProvider.of<DatabaseRepository>(
+                              context)
                           .showInsideStock(idbarang: suggestion['ID']);
                       // print(res);
                       BlocProvider.of<StockBloc>(context)
@@ -387,7 +391,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
                             validator: (text) {
-                              if (text.isNotEmpty &&
+                              if (text!.isNotEmpty &&
                                   !RegExp(r'^[0-9]*$').hasMatch(text)) {
                                 return 'must be a number';
                               } else if (text.isEmpty) {
@@ -398,7 +402,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                             onChanged: (v) {
                               BlocProvider.of<StockBloc>(context)
                                   .add(OnDataChanged(widget.data.copywith(
-                                hargaBeli: int.parse(hargaBeli.text),
+                                hargaBeli: int.parse(hargaBeli!.text),
                               )));
                             },
                             controller: hargaBeli,
@@ -413,7 +417,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                       child: TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (text) {
-                          if (text.isNotEmpty &&
+                          if (text!.isNotEmpty &&
                               !RegExp(r'^[0-9]*$').hasMatch(text)) {
                             return 'must be a number';
                           } else if (text.isEmpty) {
@@ -427,7 +431,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                         onChanged: (v) {
                           BlocProvider.of<StockBloc>(context).add(OnDataChanged(
                               widget.data.copywith(
-                                  hargaJual: int.parse(hargaJual.text))));
+                                  hargaJual: int.parse(hargaJual!.text))));
                         },
                         keyboardType: TextInputType.number,
                         decoration:
@@ -440,7 +444,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                       child: TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (text) {
-                          if (text.isNotEmpty &&
+                          if (text!.isNotEmpty &&
                               !RegExp(r'^[0-9]*$').hasMatch(text)) {
                             return 'must be a number';
                           } else if (text.isEmpty) {
@@ -451,7 +455,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                         controller: qtyc,
                         onChanged: (v) {
                           BlocProvider.of<StockBloc>(context).add(OnDataChanged(
-                              widget.data.copywith(pcs: int.parse(qtyc.text))));
+                              widget.data
+                                  .copywith(pcs: int.parse(qtyc!.text))));
                         },
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(labelText: 'jumlah unit'),
@@ -536,15 +541,15 @@ class AnimatedClipRect extends StatefulWidget {
   @override
   _AnimatedClipRectState createState() => _AnimatedClipRectState();
 
-  final Widget child;
-  final bool open;
+  final Widget? child;
+  final bool? open;
   final bool horizontalAnimation;
   final bool verticalAnimation;
   final Alignment alignment;
-  final Duration duration;
-  final Duration reverseDuration;
+  final Duration? duration;
+  final Duration? reverseDuration;
   final Curve curve;
-  final Curve reverseCurve;
+  final Curve? reverseCurve;
 
   ///The behavior of the controller when [AccessibilityFeatures.disableAnimations] is true.
   final AnimationBehavior animationBehavior;
@@ -565,8 +570,8 @@ class AnimatedClipRect extends StatefulWidget {
 
 class _AnimatedClipRectState extends State<AnimatedClipRect>
     with TickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation _animation;
+  late AnimationController _animationController;
+  late Animation _animation;
 
   @override
   void initState() {
@@ -575,7 +580,7 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
         reverseDuration: widget.reverseDuration ??
             (widget.duration ?? const Duration(milliseconds: 500)),
         vsync: this,
-        value: widget.open ? 1.0 : 0.0,
+        value: widget.open! ? 1.0 : 0.0,
         animationBehavior: widget.animationBehavior);
     _animation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
       parent: _animationController,
@@ -587,7 +592,7 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
 
   @override
   Widget build(BuildContext context) {
-    widget.open
+    widget.open!
         ? _animationController.forward()
         : _animationController.reverse();
 

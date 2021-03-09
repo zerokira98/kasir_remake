@@ -41,6 +41,6 @@ class DeleteEntry extends StockEvent {
 }
 
 class StockInitialize extends StockEvent {
-  final bool success;
+  final bool? success;
   StockInitialize({this.success});
 }

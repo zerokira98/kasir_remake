@@ -29,7 +29,8 @@ class _ListOfItemsState extends State<ListOfItems> {
         ],
       ),
       body: FutureBuilder<List>(
-          future: DBHelper.instance.showInsideItems(),
+          future: RepositoryProvider.of<DatabaseRepository>(context)
+              .showInsideItems(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               print(snapshot.data);
@@ -41,13 +42,14 @@ class _ListOfItemsState extends State<ListOfItems> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  EditItemPage(data: snapshot.data[i])));
+                                  EditItemPage(data: snapshot.data![i])));
                     },
-                    title: Text(snapshot.data[i]['NAMA']),
-                    subtitle: Text('Harga : ${snapshot.data[i]['HARGA_JUAL']}'),
+                    title: Text(snapshot.data![i]['NAMA']),
+                    subtitle:
+                        Text('Harga : ${snapshot.data![i]['HARGA_JUAL']}'),
                   );
                 },
-                itemCount: snapshot.data.length,
+                itemCount: snapshot.data!.length,
               );
             }
             return CircularProgressIndicator();
@@ -59,7 +61,7 @@ class _ListOfItemsState extends State<ListOfItems> {
 class EditItemPage extends StatefulWidget {
   final Map data;
   final ItemTr convertedData;
-  EditItemPage({this.data}) : convertedData = ItemTr.fromMap(data);
+  EditItemPage({required this.data}) : convertedData = ItemTr.fromMap(data);
 
   @override
   _EditItemPageState createState() => _EditItemPageState();
@@ -67,13 +69,13 @@ class EditItemPage extends StatefulWidget {
 
 class _EditItemPageState extends State<EditItemPage>
     with TickerProviderStateMixin {
-  SuggestionsBoxController sbc;
+  SuggestionsBoxController? sbc;
 
   TextEditingController namec = TextEditingController(),
       hargaJual = TextEditingController(),
       barcodeC = TextEditingController(),
       qtyc = TextEditingController();
-  ItemTr data;
+  late ItemTr data;
   final _formkey = GlobalKey<FormState>();
 
   DateTime selectedDate = DateTime.now();
@@ -92,6 +94,9 @@ class _EditItemPageState extends State<EditItemPage>
     if (data.hargaJual?.toString() != hargaJual.text) {
       hargaJual.text = data.hargaJual?.toString() ?? '';
     }
+    if (data.barcode != barcodeC.text) {
+      barcodeC.text = data.barcode?.toString() ?? '';
+    }
     if (data.pcs?.toString() != qtyc.text) {
       qtyc.text = data.pcs?.toString() ?? '';
     }
@@ -100,11 +105,10 @@ class _EditItemPageState extends State<EditItemPage>
         ElevatedButton(
             onPressed: () async {
               print('succ here');
-              int barcode = barcodeC.text.isEmpty || barcodeC == null
-                  ? null
-                  : int.parse(barcodeC.text);
+              int? barcode =
+                  barcodeC.text.isEmpty ? null : int.parse(barcodeC.text);
               print('succ here');
-              await DBHelper.instance
+              await RepositoryProvider.of<DatabaseRepository>(context)
                   .updateItem(data.productId, namec.text,
                       int.parse(hargaJual.text), barcode)
                   .then((value) => Navigator.pop(context));
@@ -134,7 +138,7 @@ class _EditItemPageState extends State<EditItemPage>
                           BoxShadow(
                               spreadRadius: 0.0,
                               blurRadius: 12.0,
-                              color: Colors.grey[400])
+                              color: Colors.grey[400]!)
                         ],
                       ),
                       child: Column(
@@ -146,7 +150,7 @@ class _EditItemPageState extends State<EditItemPage>
                               child: TypeAheadFormField(
                                 // autovalidate: true,
                                 validator: (text) {
-                                  if (text.length <= 2) {
+                                  if (text!.length <= 2) {
                                     return '3 or more character';
                                   }
                                   return null;
@@ -164,11 +168,12 @@ class _EditItemPageState extends State<EditItemPage>
                                         border: OutlineInputBorder(),
                                         labelText: 'Nama item')),
                                 suggestionsCallback: (pattern) async {
-                                  var res = await DBHelper.instance
+                                  var res = await RepositoryProvider.of<
+                                          DatabaseRepository>(context)
                                       .showInsideItems(query: pattern);
                                   return res;
                                 },
-                                itemBuilder: (context, suggestion) {
+                                itemBuilder: (context, dynamic suggestion) {
                                   return ListTile(
                                     leading: Icon(Icons.shopping_cart),
                                     title: Text(suggestion['NAMA']),
@@ -176,10 +181,12 @@ class _EditItemPageState extends State<EditItemPage>
                                         Text('\$${suggestion['HARGA_JUAL']}'),
                                   );
                                 },
-                                onSuggestionSelected: (suggestion) async {
-                                  var res = await DBHelper.instance
-                                      .showInsideStock(
-                                          idbarang: suggestion['ID']);
+                                onSuggestionSelected:
+                                    (dynamic suggestion) async {
+                                  // var res = await RepositoryProvider.of<
+                                  //         DatabaseRepository>(context)
+                                  //     .showInsideStock(
+                                  //         idbarang: suggestion['ID']);
                                   // print(res);
 
                                   /// dO sOMETHING
@@ -196,7 +203,7 @@ class _EditItemPageState extends State<EditItemPage>
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,
                                   validator: (text) {
-                                    if (text.isNotEmpty &&
+                                    if (text!.isNotEmpty &&
                                         !RegExp(r'^[0-9]*$').hasMatch(text)) {
                                       return 'must be a number';
                                     } else if (text.isEmpty) {
@@ -309,7 +316,7 @@ class ListOfStockItems extends StatelessWidget {
                       var hargaBeli = numFormat.format(data.hargaBeli);
                       var hargaJual = numFormat.format(data.hargaJual);
                       var totalBeli =
-                          numFormat.format(data.pcs * data.hargaBeli);
+                          numFormat.format(data.pcs! * data.hargaBeli!);
                       return Column(
                         children: [
                           if (i >= 1 &&
@@ -378,10 +385,12 @@ class ListOfStockItems extends StatelessWidget {
 }
 
 class FilterBox extends StatelessWidget {
-  var dateFrom = TextEditingController();
-  var dateTo = TextEditingController();
-  var dateFromFull, dateToFull;
-  var namaBarang = TextEditingController();
+  final dateFrom = TextEditingController();
+  final dateTo = TextEditingController();
+
+  ///*Edit this var plz-----------------
+  // final dateFromFull, dateToFull;
+  final namaBarang = TextEditingController();
   final int dropdownValue = 0;
   @override
   Widget build(BuildContext context) {
@@ -406,7 +415,7 @@ class FilterBox extends StatelessWidget {
                     offset: Offset(-8.0, -8.0),
                   )
                 ],
-                border: Border.all(color: Colors.grey[50]),
+                border: Border.all(color: Colors.grey[50]!),
                 borderRadius: BorderRadius.circular(12.0)),
             child: Column(
               children: [
@@ -450,7 +459,7 @@ class FilterBox extends StatelessWidget {
                                   DateTime.now().add(Duration(days: 365)));
                           dateFrom.text =
                               selectedDate.toString().substring(0, 10);
-                          dateFromFull = selectedDate.toString();
+                          // dateFromFull = selectedDate.toString();
                         },
                         child: TextField(
                           enabled: false,
@@ -472,7 +481,7 @@ class FilterBox extends StatelessWidget {
                                   DateTime.now().add(Duration(days: 365)));
                           dateTo.text =
                               selectedDate.toString().substring(0, 10);
-                          dateToFull = selectedDate.toString();
+                          // dateToFull = selectedDate.toString();
                         },
                         child: TextField(
                           controller: dateTo,
@@ -514,7 +523,7 @@ class FilterBox extends StatelessWidget {
                             value: 5,
                           ),
                         ],
-                        onChanged: (v) {
+                        onChanged: (dynamic v) {
                           // dropdownValue = v;
                         }),
                     Expanded(
@@ -523,9 +532,9 @@ class FilterBox extends StatelessWidget {
                           // print(namaBarang.text + dateFromFull + dateToFull);
                           BlocProvider.of<StockviewBloc>(context)
                               .add(FilterChange(
-                            name: namaBarang.text ?? '',
-                            dateStart: dateFromFull,
-                            dateEnd: dateToFull,
+                            name: namaBarang.text,
+                            // dateStart: dateFromFull,
+                            // dateEnd: dateToFull,
                           ));
                         },
                         child: Text('Go'),
@@ -549,15 +558,15 @@ class AnimatedClipRect extends StatefulWidget {
   @override
   _AnimatedClipRectState createState() => _AnimatedClipRectState();
 
-  final Widget child;
-  final bool open;
+  final Widget? child;
+  final bool? open;
   final bool horizontalAnimation;
   final bool verticalAnimation;
   final Alignment alignment;
-  final Duration duration;
-  final Duration reverseDuration;
+  final Duration? duration;
+  final Duration? reverseDuration;
   final Curve curve;
-  final Curve reverseCurve;
+  final Curve? reverseCurve;
 
   ///The behavior of the controller when [AccessibilityFeatures.disableAnimations] is true.
   final AnimationBehavior animationBehavior;
@@ -578,8 +587,8 @@ class AnimatedClipRect extends StatefulWidget {
 
 class _AnimatedClipRectState extends State<AnimatedClipRect>
     with TickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation _animation;
+  late AnimationController _animationController;
+  late Animation _animation;
 
   @override
   void initState() {
@@ -588,7 +597,7 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
         reverseDuration: widget.reverseDuration ??
             (widget.duration ?? const Duration(milliseconds: 500)),
         vsync: this,
-        value: widget.open ? 1.0 : 0.0,
+        value: widget.open! ? 1.0 : 0.0,
         animationBehavior: widget.animationBehavior);
     _animation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
       parent: _animationController,
@@ -600,7 +609,7 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
 
   @override
   Widget build(BuildContext context) {
-    widget.open
+    widget.open!
         ? _animationController.forward()
         : _animationController.reverse();
 

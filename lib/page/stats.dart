@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -91,7 +93,7 @@ class _StatsState extends State<Stats> {
         LineChartBarData(
           barWidth: 1.0,
           colors: [
-            Colors.lightBlue[300],
+            Colors.lightBlue[300]!,
           ],
           spots: spotsValue,
         ),

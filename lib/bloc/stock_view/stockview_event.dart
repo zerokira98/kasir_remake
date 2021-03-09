@@ -1,3 +1,5 @@
+
+
 part of 'stockview_bloc.dart';
 
 abstract class StockviewEvent extends Equatable {

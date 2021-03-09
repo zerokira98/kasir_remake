@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 class TabCustom extends StatefulWidget {
   final PageController pageController;
-  final int length;
-  final List items;
-  TabCustom({@required this.pageController, this.length, List<String> items})
+  final int? length;
+  final List? items;
+  TabCustom({required this.pageController, this.length, List<String>? items})
       : this.items = items;
 
   @override
@@ -15,28 +15,28 @@ class TabCustom extends StatefulWidget {
 
 class _TabCustomState extends State<TabCustom>
     with SingleTickerProviderStateMixin {
-  TabController pc;
-  List<String> items;
-  PageController pageController;
-  int selectedIndex = 0, length;
+  late TabController pc;
+  List<String>? items;
+  late PageController pageController;
+  int? selectedIndex = 0, length;
   double selectedsizewidth = 0.0;
 
   @override
   void initState() {
-    items = this.widget.items;
-    length = items.length ?? this.widget.length;
+    items = this.widget.items as List<String>?;
+    length = items?.length ?? this.widget.length;
     pageController = this.widget.pageController;
-    pc = TabController(length: length, vsync: this);
+    pc = TabController(length: length!, vsync: this);
     pc.addListener(() {
       pageController.animateToPage(pc.index,
           curve: Curves.ease, duration: Duration(milliseconds: 500));
     });
 
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      RenderBox a = context.findRenderObject();
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+      RenderBox? a = context.findRenderObject() as RenderBox?;
       setState(() {
-        selectedsizewidth = a.size.width / length;
+        selectedsizewidth = a!.size.width / length!;
       });
     });
   }
@@ -66,7 +66,7 @@ class _TabCustomState extends State<TabCustom>
                   duration: Duration(milliseconds: 500),
                   top: 2,
                   bottom: 2,
-                  left: selectedIndex * selectedsizewidth,
+                  left: selectedIndex! * selectedsizewidth,
                   child: Container(
                       width: selectedsizewidth,
                       decoration: BoxDecoration(
@@ -77,11 +77,11 @@ class _TabCustomState extends State<TabCustom>
                 Positioned.fill(
                   child: Row(
                     children: [
-                      for (int i = 0; i < length; i++)
+                      for (int i = 0; i < length!; i++)
                         Expanded(
                           child: MaterialButton(
                             elevation: 0,
-                            child: Text(items[i] ?? 'Tab $i',
+                            child: Text(items?[i] ?? 'Tab $i',
                                 style: TextStyle(
                                     color: selectedIndex == i
                                         ? Colors.white

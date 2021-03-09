@@ -14,15 +14,15 @@ class StockviewLoading extends StockviewState {}
 class StockviewLoaded extends StockviewState {
   final List<ItemTr> data;
   final Filter filter;
-  StockviewLoaded(this.data, Filter filter) : this.filter = filter ?? Filter();
+  StockviewLoaded(this.data, this.filter);
   @override
   List<Object> get props => [data];
 }
 
 class Filter extends Equatable {
-  final String nama;
+  final String? nama;
   Filter({this.nama});
 
   @override
-  List<Object> get props => [nama];
+  List<Object?> get props => [nama];
 }

@@ -41,7 +41,7 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
   Provider provider = Provider.Unidentified;
   var nomorController = TextEditingController();
   var kodeController = TextEditingController();
-  String kode = '',
+  String? kode = '',
       nominal = '',
       nomorHP = '',
       pin = '1234',
@@ -54,9 +54,9 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
     super.initState();
   }
 
-  bool get isValid => provider != Provider.Unidentified && nomorHP.length > 10;
+  bool get isValid => provider != Provider.Unidentified && nomorHP!.length > 10;
 
-  int nominalValue;
+  int? nominalValue;
   var nominalData = [
     5000,
     10000,
@@ -69,7 +69,7 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
     nomorHP = nomorController.text.trim();
     if (nomorController.text.length >= 4) {
       setState(() {
-        provider = checkNumberProvider(nomorHP.substring(0, 4));
+        provider = checkNumberProvider(nomorHP!.substring(0, 4));
         kode = getCode(provider);
       });
     } else {
@@ -83,29 +83,23 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
       nominalData[3] = 25000;
     }
     kodeController.text =
-        kode + nominal + '.' + nomorController.text + '.' + pin;
+        kode! + nominal! + '.' + nomorController.text + '.' + pin!;
   }
 
   String getCode(Provider pvd) {
     switch (pvd) {
       case Provider.Axis:
         return 'X';
-        break;
       case Provider.Indosat:
         return 'MM';
-        break;
       case Provider.Smartfren:
         return 'I';
-        break;
       case Provider.Telkomsel:
         return 'S';
-        break;
       case Provider.Three:
         return 'T';
-        break;
       case Provider.Xl:
         return 'X';
-        break;
       default:
         return '';
     }
@@ -159,17 +153,17 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
                           value: e,
                         );
                       }).toList(),
-                      onChanged: (val) {
+                      onChanged: (dynamic val) {
                         setState(() {
                           nominalValue = val;
                           nominal = (val ~/ 1000).toString();
 
-                          kodeController.text = kode +
-                              nominal +
+                          kodeController.text = kode! +
+                              nominal! +
                               '.' +
                               nomorController.text +
                               '.' +
-                              pin;
+                              pin!;
                         });
                       }),
                   Text('provider : ' + (provider.toString()).split('.')[1]),
@@ -230,12 +224,12 @@ class _TransaksiPulsaState extends State<TransaksiPulsa> {
                         ),
                       ],
                       value: smsCenter,
-                      onChanged: (val) {
+                      onChanged: (dynamic val) {
                         setState(() {
                           smsCenter = val;
                         });
                       }),
-                  Text(checkNumberProvider(smsCenter.substring(0, 4))
+                  Text(checkNumberProvider(smsCenter!.substring(0, 4))
                       .toString()
                       .split('.')[1]),
                 ],

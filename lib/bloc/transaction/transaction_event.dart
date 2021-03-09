@@ -1,9 +1,11 @@
+
+
 part of 'transaction_bloc.dart';
 
 @immutable
 abstract class TransactionEvent extends Equatable {
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class LoadInitial extends TransactionEvent {}
@@ -20,8 +22,8 @@ class UpdateItem extends TransactionEvent {
 }
 
 class DeleteItem extends TransactionEvent {
-  final ItemTr item;
+  final ItemTr? item;
   DeleteItem(this.item);
   @override
-  List<Object> get props => [item];
+  List<Object?> get props => [item];
 }

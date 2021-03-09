@@ -12,7 +12,10 @@ part 'stock_event.dart';
 part 'stock_state.dart';
 
 class StockBloc extends Bloc<StockEvent, StockState> {
-  StockBloc() : super(StockInitial()) {
+  DatabaseRepository _dbHelper;
+  StockBloc(DatabaseRepository dbHelper)
+      : _dbHelper = dbHelper,
+        super(StockInitial()) {
     ///do smg
     add(StockInitialize(success: false));
   }
@@ -63,7 +66,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
         yield (StockLoading());
         await Future.delayed(Duration(seconds: 1));
         try {
-          await DBHelper.instance.addItem(data);
+          await _dbHelper.addItem(data);
           yield StockInitial();
           add(StockInitialize(success: true));
         } catch (e) {
@@ -74,18 +77,21 @@ class StockBloc extends Bloc<StockEvent, StockState> {
         // }
       }
       if (event is NewStockEntry) {
-        var prevData = (state as StockLoaded).data;
-        DateTime Function() ditambahkan = () {
-          if (prevData.isNotEmpty) {
-            return prevData.last.ditambahkan;
-          }
-          return DateTime.now().toUtc();
-        };
+        List<ItemTr> prevData = (state as StockLoaded).data;
+        // DateTime Function() ditambahkan = () {
+        //   if (prevData.isNotEmpty) {
+        //     return prevData.last.ditambahkan;
+        //   }
+        //   return DateTime.now().toUtc();
+        // };
+        DateTime? ditambahkan = prevData.isNotEmpty
+            ? prevData.last.ditambahkan
+            : DateTime.now().toUtc();
         yield StockLoaded((state as StockLoaded).data +
             [
               ItemTr(
                   id: Random().nextInt(510),
-                  ditambahkan: ditambahkan(),
+                  ditambahkan: ditambahkan,
                   expdate: DateTime.now().add(Duration(days: 690)),
                   open: false)
             ]);

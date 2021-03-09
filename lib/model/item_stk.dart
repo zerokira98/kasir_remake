@@ -1,20 +1,22 @@
-import 'package:equatable/equatable.dart';
+// // @dart=2.9
 
-class ItemStk extends Equatable {
-  final String name;
-  final int hargaBeli;
-  final int hargaJual;
-  final int pcs;
-  final String tempatBeli;
-  final int id;
-  ItemStk(
-      {this.name,
-      this.hargaBeli,
-      this.hargaJual,
-      this.pcs,
-      this.tempatBeli,
-      this.id});
+// import 'package:equatable/equatable.dart';
 
-  @override
-  List<Object> get props => [];
-}
+// class ItemStk extends Equatable {
+//   final String name;
+//   final int hargaBeli;
+//   final int hargaJual;
+//   final int pcs;
+//   final String tempatBeli;
+//   final int id;
+//   ItemStk(
+//       {this.name,
+//       this.hargaBeli,
+//       this.hargaJual,
+//       this.pcs,
+//       this.tempatBeli,
+//       this.id});
+
+//   @override
+//   List<Object> get props => [];
+// }

@@ -1,17 +1,19 @@
+
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewBlocObserver extends BlocObserver {
   @override
-  void onEvent(Bloc bloc, Object event) {
+  void onEvent(Bloc bloc, Object? event) {
     print(event);
     // print(bloc);
     super.onEvent(bloc, event);
   }
 
   @override
-  void onError(Cubit cubit, Object error, StackTrace stacktrace) {
+  void onError(Bloc bloc, Object error, StackTrace stackTrace) {
     print(error);
-    super.onError(cubit, error, stacktrace);
+    super.onError(bloc, error, stackTrace);
   }
 
   @override

@@ -11,9 +11,9 @@ class Mains extends StatefulWidget {
 
 class _MainsState extends State<Mains> with SingleTickerProviderStateMixin {
   // Alignment ali = Alignment(0, 0);
-  var x = 0.0, y = 0.0;
-  Animation ani;
-  AnimationController acon;
+  double x = 0.0, y = 0.0;
+  late Animation ani;
+  late AnimationController acon;
   @override
   void initState() {
     super.initState();
@@ -27,7 +27,7 @@ class _MainsState extends State<Mains> with SingleTickerProviderStateMixin {
         Tween<Offset>(begin: Offset(x, y), end: Offset(0.0, 0.0)).animate(acon);
   }
 
-  File file;
+  File? file;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,8 +53,8 @@ class _MainsState extends State<Mains> with SingleTickerProviderStateMixin {
         },
         onPanUpdate: (details) {
           // print(details.delta);
-          var x = details.delta.dx;
-          var y = details.delta.dy;
+          double x = details.delta.dx;
+          double y = details.delta.dy;
           setState(() {
             this.x += x;
             this.y += y;
@@ -116,16 +116,16 @@ class Mains1 extends StatelessWidget {
 }
 
 class PageA extends StatefulWidget {
-  final PageController pc;
-  final int index;
-  PageA({this.pc, int index}) : this.index = index;
+  final PageController? pc;
+  final int? index;
+  PageA({this.pc, int? index}) : this.index = index;
 
   @override
   _PageAState createState() => _PageAState();
 }
 
 class _PageAState extends State<PageA> {
-  PageController pc;
+  PageController? pc;
   EdgeInsets margin = EdgeInsets.fromLTRB(0, 0, 0, 0);
   @override
   void dispose() {
@@ -134,7 +134,7 @@ class _PageAState extends State<PageA> {
 
   void onChange() {
     // print(pc.offset);
-    if (pc.offset >= 423 * this.widget.index) {
+    if (pc!.offset >= 423 * this.widget.index!) {
       margin = EdgeInsets.fromLTRB(18, 0, 18, 64);
     } else {
       Future.delayed(Duration(milliseconds: 200), () {
@@ -153,7 +153,7 @@ class _PageAState extends State<PageA> {
   initState() {
     super.initState();
     pc = this.widget.pc;
-    pc.addListener(() {
+    pc!.addListener(() {
       onChange();
     });
   }
@@ -173,7 +173,7 @@ class _PageAState extends State<PageA> {
       transform: Matrix4.identity()
         ..rotateZ(-22 /
             7 *
-            this.widget.pc.offset /
+            this.widget.pc!.offset /
             (MediaQuery.of(context).size.width * 4)),
       child: Center(
         child: Text('Page A ${this.widget.index}'),
@@ -183,14 +183,14 @@ class _PageAState extends State<PageA> {
 }
 
 class PageB extends StatefulWidget {
-  final PageController pc;
+  final PageController? pc;
   PageB({this.pc});
   @override
   _PageBState createState() => _PageBState();
 }
 
 class _PageBState extends State<PageB> {
-  PageController pc;
+  PageController? pc;
   EdgeInsets margin = EdgeInsets.fromLTRB(0, 0, 0, 0);
 
   @override
@@ -201,7 +201,7 @@ class _PageBState extends State<PageB> {
   void onChange() {
     // print('0ffset = ${pc.offset}');
     // print('width = ${MediaQuery.of(context).size.width}');
-    if (pc.offset >= 423) {
+    if (pc!.offset >= 423) {
       Future.delayed(Duration(milliseconds: 200), () {
         setState(() {
           margin = EdgeInsets.fromLTRB(0, 0, 0, 0);
@@ -219,7 +219,7 @@ class _PageBState extends State<PageB> {
   initState() {
     super.initState();
     pc = this.widget.pc;
-    pc.addListener(() {
+    pc!.addListener(() {
       onChange();
     });
   }
@@ -232,7 +232,7 @@ class _PageBState extends State<PageB> {
         (MediaQuery.of(context).size.width * 4);
     var zVal = 22 /
         7 *
-        this.widget.pc.offset /
+        this.widget.pc!.offset /
         (MediaQuery.of(context).size.width * 4);
     print(maxoffset);
     return AnimatedContainer(

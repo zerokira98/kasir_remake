@@ -9,7 +9,10 @@ part 'stockview_event.dart';
 part 'stockview_state.dart';
 
 class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
-  StockviewBloc() : super(StockviewInitial()) {
+  DatabaseRepository _dbHelper;
+  StockviewBloc(DatabaseRepository dbHelper)
+      : _dbHelper = dbHelper,
+        super(StockviewInitial()) {
     add(Initializeview());
   }
 
@@ -18,7 +21,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     StockviewEvent event,
   ) async* {
     if (event is Initializeview) {
-      List dbres = await DBHelper.instance.showInsideStock(showName: true);
+      List<dynamic> dbres = await (_dbHelper.showInsideStock(showName: true));
       List<ItemTr> convert = dbres.map<ItemTr>((e) {
         var dateDb = e['ADD_DATE'].toString();
         bool isUtc = dateDb.contains('Z');
@@ -41,11 +44,11 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     }
     if (event is FilterChange) {
       yield StockviewLoading();
-      List dbres = await DBHelper.instance.showInsideStock(
+      List dbres = await (_dbHelper.showInsideStock(
           showName: true,
           name: event.name,
           startDate: event.dateStart,
-          endDate: event.dateEnd);
+          endDate: event.dateEnd));
       List<ItemTr> convert = dbres.map<ItemTr>((e) {
         var dateDb = e['ADD_DATE'].toString();
         bool isUtc = dateDb.contains('Z');

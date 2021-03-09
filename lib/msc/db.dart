@@ -1,30 +1,32 @@
+import 'dart:async';
+
 import 'package:kasir_remake/model/item_tr.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-class DBHelper {
+class DatabaseProvider {
   static final _dbName = 'db_kasir';
   static final _dbVersion = 1;
-  DBHelper._();
-  static final DBHelper instance = DBHelper._();
-  static Database _db;
-  Future<Database> get db async {
-    if (_db != null) {
-      return _db;
-    } else {
-      _db = await _initDatabase();
-      return _db;
-    }
+  static final _instance = DatabaseProvider._internal();
+  static DatabaseProvider get = _instance;
+  bool isInitialized = false;
+  late Database _db;
+
+  DatabaseProvider._internal();
+
+  Future<Database> db() async {
+    if (!isInitialized) await _init();
+    return _db;
   }
 
-  _initDatabase() async {
-    String dir = await getDatabasesPath();
+  Future _init() async {
+    String dir = await (getDatabasesPath() as FutureOr<String>);
     String path = join(dir, _dbName);
-    // try {
-    return await openDatabase(path, version: _dbVersion,
-        onCreate: (db, _dbversion) async {
-      // `ID_LOG` int NOT NULL,
-      await db.execute('''
+    try {
+      _db = await openDatabase(path, version: _dbVersion,
+          onCreate: (db, _dbversion) async {
+        // `ID_LOG` int NOT NULL,
+        await db.execute('''
         CREATE TABLE add_stock (
       ID integer primary key autoincrement,
   PRICE decimal(10,0) NOT NULL,
@@ -36,7 +38,7 @@ class DBHelper {
   FOREIGN KEY(SUPPLIER) REFERENCES tempat_beli(ID)
   );
         ''');
-      await db.execute('''
+        await db.execute('''
 CREATE TABLE `items` (
       `ID` integer primary key autoincrement,
   `NAMA` varchar(50) NOT NULL,
@@ -46,42 +48,133 @@ CREATE TABLE `items` (
   `TGL_POSTING` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `HARGA_JUAL` decimal(10,0) NOT NULL
 ) ;''');
-      await db.execute('''
+        await db.execute('''
 CREATE TABLE `transactions` (
   `ID` integer primary key autoincrement,
   `NAMA` varchar(10) NOT NULL,
   `TANGGAL` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ''');
-      await db.execute('''
+        await db.execute('''
 CREATE TABLE `transactions_items` (
   `TR_ID` integer,
   `PRODUCT_ID` int NOT NULL,
   `QTY` smallint NOT NULL
 );''');
-      await db.execute('''
+        await db.execute('''
 CREATE TABLE `price_log` (
       `ID` integer ,
       `PRODUCT_ID` int NOT NULL,
   `PRICE` decimal(10,0) NOT NULL,
   `DATE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );''');
-      await db.execute('''
+        await db.execute('''
 CREATE TABLE `tempat_beli` (
   `ID` integer primary key autoincrement,
   `NAMA` varchar(50) NOT NULL,
   `DESC` varchar(64) NULL
 );''');
-      await db.insert('tempat_beli', {'NAMA': '', 'DESC': 'Diisi Kosong'});
-    });
-    // return a;
-    // } catch (e) {
-    //   print(e);
-    // }
+        await db.insert('tempat_beli', {'NAMA': '', 'DESC': 'Diisi Kosong'});
+      });
+      isInitialized = !isInitialized;
+    } on DatabaseException catch (e) {
+      throw Exception(e);
+    }
   }
+}
+
+class DatabaseRepository {
+  DatabaseProvider databaseProvider;
+  // Database _db;
+
+  DatabaseRepository(this.databaseProvider);
+  // DBHelper() {
+  //   if (_db == null) {
+  //     _initDatabase().then((db) {
+  //       _db = db;
+  //     });
+  //     // return _db;
+  //   }
+  //   // else {
+  //   //   // return _db;
+  //   // }
+  // }
+  // DBHelper._();
+  // static final DBHelper instance = DBHelper._();
+  // <Database> get db  {
+  // if (_db == null) {
+  //   _db = await _initDatabase();
+  //   return _db;
+  // } else {
+  //   return _db;
+  // }
+  // }
+
+//   Future<Database> _initDatabase() async {
+//     String dir = await getDatabasesPath();
+//     String path = join(dir, _dbName);
+//     // try {
+//     return await openDatabase(path, version: _dbVersion,
+//         onCreate: (db, _dbversion) async {
+//       // `ID_LOG` int NOT NULL,
+//       await db.execute('''
+//         CREATE TABLE add_stock (
+//       ID integer primary key autoincrement,
+//   PRICE decimal(10,0) NOT NULL,
+//   QTY int NOT NULL,
+//   EXP date DEFAULT NULL,
+//   ADD_DATE timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+//   ID_BRG int  NULL,
+//   SUPPLIER int NULL,
+//   FOREIGN KEY(SUPPLIER) REFERENCES tempat_beli(ID)
+//   );
+//         ''');
+//       await db.execute('''
+// CREATE TABLE `items` (
+//       `ID` integer primary key autoincrement,
+//   `NAMA` varchar(50) NOT NULL,
+//   `BARCODE` int DEFAULT NULL,
+//   `JUMLAH` smallint NOT NULL,
+//   `EXP_DATE` date DEFAULT NULL,
+//   `TGL_POSTING` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+//   `HARGA_JUAL` decimal(10,0) NOT NULL
+// ) ;''');
+//       await db.execute('''
+// CREATE TABLE `transactions` (
+//   `ID` integer primary key autoincrement,
+//   `NAMA` varchar(10) NOT NULL,
+//   `TANGGAL` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+// );
+// ''');
+//       await db.execute('''
+// CREATE TABLE `transactions_items` (
+//   `TR_ID` integer,
+//   `PRODUCT_ID` int NOT NULL,
+//   `QTY` smallint NOT NULL
+// );''');
+//       await db.execute('''
+// CREATE TABLE `price_log` (
+//       `ID` integer ,
+//       `PRODUCT_ID` int NOT NULL,
+//   `PRICE` decimal(10,0) NOT NULL,
+//   `DATE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+// );''');
+//       await db.execute('''
+// CREATE TABLE `tempat_beli` (
+//   `ID` integer primary key autoincrement,
+//   `NAMA` varchar(50) NOT NULL,
+//   `DESC` varchar(64) NULL
+// );''');
+//       await db.insert('tempat_beli', {'NAMA': '', 'DESC': 'Diisi Kosong'});
+//     });
+//     // return a;
+//     // } catch (e) {
+//     //   print(e);
+//     // }
+//   }
 
   test() async {
-    Database database = await db;
+    Database database = await databaseProvider.db();
     var result = await database.query('tempat_beli');
     // String sql = '''SELECT * FROM items WHERE TGL_POSTING <= ?''';
     // String sql = '''SELECT * FROM sqlite_master WHERE type=?''';
@@ -102,16 +195,16 @@ CREATE TABLE `tempat_beli` (
   }
 
   closeDb() async {
-    String dir = await getDatabasesPath();
-    String path = join(dir, _dbName);
-    await deleteDatabase(path);
-    _db = null;
-    print('lewat cosedb');
+    // String dir = await getDatabasesPath();
+    // String path = join(dir, _dbName);
+    // await deleteDatabase(path);
+    // _db = null;
+    // print('lewat cosedb');
   }
 
   Future<int> updateItem(
-      int idBrg, String nama, int hargaJual, int barcode) async {
-    Database database = await db;
+      int? idBrg, String? nama, int? hargaJual, int? barcode) async {
+    Database database = await databaseProvider.db();
     Map<String, dynamic> values = Map<String, dynamic>();
     if (nama != null) values.addAll({'NAMA': nama});
     if (hargaJual != null) values.addAll({'HARGA_JUAL': hargaJual});
@@ -121,12 +214,12 @@ CREATE TABLE `tempat_beli` (
   }
 
   addItem(List<ItemTr> data) async {
-    Database database = await db;
+    Database database = await databaseProvider.db();
     try {
       for (var item in data) {
         print('iterations');
         int result;
-        var checkItem = await database
+        List<dynamic> checkItem = await database
             .query('items', where: 'NAMA=?', whereArgs: [item.name]);
 
         /// if not found, add new into items. else just insert add_stock
@@ -141,7 +234,7 @@ CREATE TABLE `tempat_beli` (
             item.barcode
           ]);
         } else {
-          var jumlah = (checkItem[0]['JUMLAH'] as int) + item.pcs;
+          int jumlah = (checkItem[0]['JUMLAH'] as int) + item.pcs!;
           String sql =
               '''UPDATE items set HARGA_JUAL=? ,JUMLAH=?,EXP_DATE=? WHERE ID=? ''';
           await database.rawUpdate(sql, [
@@ -185,18 +278,19 @@ CREATE TABLE `tempat_beli` (
   }
 
   showTables() async {
-    Database database = await db;
+    Database database = await databaseProvider.db();
     String sql = '''SELECT name FROM sqlite_master WHERE type="table"''';
     // String sql = '''SELECT name FROM PRAGMA_TABLE_INFO('price_log');''';
     var result = await database.rawQuery(sql);
     print(result);
   }
 
-  Future<List> showInsideItems({String barcode, String query}) async {
-    Database database = await db;
+  Future<List> showInsideItems({String? barcode, String? query}) async {
+    Database database = await databaseProvider.db();
+    List result = [];
     if (barcode != null) {
       String sql = '''SELECT * FROM items WHERE CAST(BARCODE AS TEXT) LIKE ?''';
-      var result = await database.rawQuery(sql, ['$barcode%']);
+      result = await database.rawQuery(sql, ['$barcode%']);
       print(result);
       return result;
     } else if ((query == null) && (barcode == null)) {
@@ -207,32 +301,32 @@ CREATE TABLE `tempat_beli` (
           ''';
       // LEFT JOIN tempat_beli ON tempat_beli.ID = add_stock
       // ORDER_BY items.NAMA
-      var result = await database.rawQuery(sql);
+      result = await database.rawQuery(sql);
       print(result);
       return result;
-    } else if (query.length >= 2) {
+    } else if (query!.length >= 2) {
       String sql = '''SELECT * FROM items WHERE NAMA LIKE ?''';
-      var result = await database.rawQuery(sql, ['%$query%']);
+      result = await database.rawQuery(sql, ['%$query%']);
       print(result);
       return result;
     }
-    return null;
+    return result;
   }
 
   Future<List> showInsideStock(
-      {int idbarang,
-      String name,
-      String startDate,
-      bool showName,
-      String endDate}) async {
+      {int? idbarang,
+      String? name,
+      String? startDate,
+      bool? showName,
+      String? endDate}) async {
     name = name ?? ' ';
     startDate =
         startDate ?? DateTime.now().subtract(Duration(days: 5110)).toString();
     endDate = endDate ?? DateTime.now().add(Duration(days: 5110)).toString();
     bool showname = showName ?? false;
-    var result;
+    List result = [];
     String sql;
-    Database database = await db;
+    Database database = await databaseProvider.db();
     try {
       if (idbarang != null) {
         sql = '''SELECT * FROM add_stock WHERE ID_BRG=?''';
@@ -253,10 +347,10 @@ CREATE TABLE `tempat_beli` (
     return result;
   }
 
-  Future<List> showPlaces({String query}) async {
+  Future<List> showPlaces({String? query}) async {
     print('hajime');
     query = query ?? '';
-    var database = await db;
+    var database = await databaseProvider.db();
     if (query.length >= 1 || query == '') {
       try {
         print('%' + query + '%');
@@ -280,7 +374,7 @@ CREATE TABLE `tempat_beli` (
   }
 
   Future transaction(List<ItemTr> data) async {
-    Database database = await db;
+    Database database = await databaseProvider.db();
     String sql = '''INSERT INTO transactions(NAMA) VALUES(?)''';
     var trInsert = await database.rawInsert(sql, ['Kiki']);
     String sql2 =
@@ -297,7 +391,7 @@ CREATE TABLE `tempat_beli` (
   }
 
   void insideTrans() async {
-    Database database = await db;
+    Database database = await databaseProvider.db();
     String sql = '''SELECT * FROM transactions_items''';
     String sql2 = '''SELECT * FROM transactions''';
 

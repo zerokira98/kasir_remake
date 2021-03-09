@@ -1,3 +1,5 @@
+
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:kasir_remake/bloc/stock_view/stockview_bloc.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
 import 'package:kasir_remake/insertbaru.dart';
 import 'package:kasir_remake/msc/bloc_observer.dart';
+import 'package:kasir_remake/msc/db.dart';
 import 'package:kasir_remake/page/debug.dart';
 import 'package:kasir_remake/page/stats.dart';
 import 'package:kasir_remake/transaksipage.dart';
@@ -22,28 +25,34 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => TransactionBloc(),
+    return RepositoryProvider(
+      create: (context) => DatabaseRepository(DatabaseProvider.get),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => TransactionBloc(
+                RepositoryProvider.of<DatabaseRepository>(context)),
+          ),
+          BlocProvider(
+            create: (context) =>
+                StockBloc(RepositoryProvider.of<DatabaseRepository>(context)),
+          ),
+          BlocProvider(
+            create: (context) => StockviewBloc(
+                RepositoryProvider.of<DatabaseRepository>(context)),
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder()
+            }),
+            primarySwatch: Colors.red,
+          ),
+          home: HomePage(),
         ),
-        BlocProvider(
-          create: (context) => StockBloc(),
-        ),
-        BlocProvider(
-          create: (context) => StockviewBloc(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          pageTransitionsTheme: PageTransitionsTheme(builders: {
-            TargetPlatform.android: CupertinoPageTransitionsBuilder()
-          }),
-          primarySwatch: Colors.red,
-        ),
-        home: HomePage(),
       ),
     );
   }

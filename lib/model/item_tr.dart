@@ -2,18 +2,18 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 class ItemTr extends Equatable {
-  final String name;
-  final int hargaBeli;
-  final int hargaJual;
-  final int pcs;
-  final GlobalKey<FormState> formkey;
-  final int productId;
-  final String tempatBeli;
-  final String barcode;
-  final int id;
-  final bool open;
-  final DateTime expdate;
-  final DateTime ditambahkan;
+  final String? name;
+  final int? hargaBeli;
+  final int? hargaJual;
+  final int? pcs;
+  final GlobalKey<FormState>? formkey;
+  final int? productId;
+  final String? tempatBeli;
+  final String? barcode;
+  final int? id;
+  final bool? open;
+  final DateTime? expdate;
+  final DateTime? ditambahkan;
 
   ItemTr(
       {this.name,
@@ -22,28 +22,25 @@ class ItemTr extends Equatable {
       this.hargaJual,
       this.pcs,
       this.formkey,
-      String barcode,
-      String tempatBeli,
+      this.barcode,
+      this.tempatBeli,
       this.open,
       this.expdate,
       this.ditambahkan,
-      int id})
-      : this.id = id,
-        this.barcode = barcode,
-        this.tempatBeli = tempatBeli ?? '';
+      this.id});
   ItemTr copywith(
-      {String name,
-      int hargaBeli,
-      int hargaJual,
-      int pcs,
-      String tempatBeli,
-      int productId,
-      bool open,
-      GlobalKey<FormState> formkey,
-      String barcode,
-      DateTime expdate,
-      DateTime ditambahkan,
-      int id}) {
+      {String? name,
+      int? hargaBeli,
+      int? hargaJual,
+      int? pcs,
+      String? tempatBeli,
+      int? productId,
+      bool? open,
+      GlobalKey<FormState>? formkey,
+      String? barcode,
+      DateTime? expdate,
+      DateTime? ditambahkan,
+      int? id}) {
     return ItemTr(
         barcode: barcode ?? this.barcode,
         open: open ?? this.open,
@@ -60,7 +57,7 @@ class ItemTr extends Equatable {
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         name,
         hargaBeli,
         hargaJual,
@@ -84,7 +81,7 @@ class ItemTr extends Equatable {
 
   static ItemTr fromMap(Map data) {
     return ItemTr(
-      barcode: data['BARCODE'],
+      barcode: data['BARCODE'].toString(),
       // open: data[''],
       name: data['NAMA'],
       // formkey: formkey ?? this.formkey,

@@ -13,7 +13,10 @@ part 'transaction_event.dart';
 part 'transaction_state.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
-  TransactionBloc() : super(TransactionInitial()) {
+  DatabaseRepository _dbHelper;
+  TransactionBloc(DatabaseRepository dbHelper)
+      : _dbHelper = dbHelper,
+        super(TransactionInitial()) {
     ///do Something
     add(LoadInitial());
   }
@@ -28,10 +31,10 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
           data: [ItemTr(id: Random().nextInt(210), open: true)]);
     }
     if (event is UploadToDB) {
-      var data = (state as TransactionLoaded).data;
+      List<ItemTr> data = (state as TransactionLoaded).data;
       yield TransactionLoading();
       try {
-        await DBHelper.instance.transaction(data);
+        await _dbHelper.transaction(data);
         yield TransactionInitial();
         add(LoadInitial());
       } catch (e) {
@@ -63,7 +66,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       print('delete item');
       yield TransactionLoaded(
           data: (state as TransactionLoaded).data.map((e) {
-        return e.id != event.item.id ? e : event.item.copywith(open: false);
+        return e.id != event.item!.id ? e : event.item!.copywith(open: false);
       }).toList());
 
       await Future.delayed(Duration(milliseconds: 500), () {});

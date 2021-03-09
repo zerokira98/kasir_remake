@@ -1,4 +1,7 @@
+
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/listviewof_item.dart';
 import 'package:kasir_remake/msc/db.dart';
 
@@ -22,32 +25,35 @@ class DebugPage extends StatelessWidget {
             child: ElevatedButton(
               child: Text('transactions'),
               onPressed: () {
-                DBHelper.instance.insideTrans();
+                RepositoryProvider.of<DatabaseRepository>(context)
+                    .insideTrans();
               },
             ),
           ),
           ElevatedButton(
             child: Text('press inside items'),
             onPressed: () {
-              DBHelper.instance.showInsideItems();
+              RepositoryProvider.of<DatabaseRepository>(context)
+                  .showInsideItems();
             },
           ),
           ElevatedButton(
             child: Text('press inside add_stock'),
             onPressed: () {
-              DBHelper.instance.showInsideStock();
+              RepositoryProvider.of<DatabaseRepository>(context)
+                  .showInsideStock();
             },
           ),
           ElevatedButton(
             child: Text('close database'),
             onPressed: () {
-              DBHelper.instance.closeDb();
+              RepositoryProvider.of<DatabaseRepository>(context).closeDb();
             },
           ),
           ElevatedButton(
             child: Text('show tables'),
             onPressed: () {
-              DBHelper.instance.showTables();
+              RepositoryProvider.of<DatabaseRepository>(context).showTables();
             },
           ),
           ElevatedButton(
@@ -55,7 +61,7 @@ class DebugPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ListOfItems()));
-              // DBHelper.instance.test();
+              // RepositoryProvider.of<DBHelper>(context).test();
               // List numb = [1, 2, 3, 4];
               // var numb2 = numb;
               // numb2.removeLast();
@@ -100,7 +106,7 @@ class DebugPage extends StatelessWidget {
               //   print('key :' + key);
               //   print('value :' + value.toString());
               // });
-              // DBHelper.instance.showPlaces();
+              // RepositoryProvider.of<DBHelper>(context).showPlaces();
               // print(DateTime.now());
               // Navigator.push(
               //     context,

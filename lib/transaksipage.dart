@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
@@ -90,8 +92,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
             decoration: BoxDecoration(
                 color: Theme.of(context).primaryColorDark,
                 border: Border(
-                  top: BorderSide(width: 2.0, color: Colors.blueGrey[300]),
-                  bottom: BorderSide(width: 2.0, color: Colors.blueGrey[300]),
+                  top: BorderSide(width: 2.0, color: Colors.blueGrey[300]!),
+                  bottom: BorderSide(width: 2.0, color: Colors.blueGrey[300]!),
                 )),
             height: 64,
             child: Row(
@@ -105,7 +107,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                       if (state is TransactionLoaded) {
                         state.data.forEach((e) {
                           if (e.pcs != null && e.hargaJual != null) {
-                            total += e.pcs * e.hargaJual;
+                            total += e.pcs! * e.hargaJual!;
                           }
                         });
                         // if(total.length>4);

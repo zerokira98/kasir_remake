@@ -23,7 +23,7 @@ class CheckOutTr extends StatelessWidget {
               print(state.data);
               var totalHrg = 0, totalQty = 0;
               for (var a in state.data) {
-                totalHrg += a.hargaJual * a.pcs ?? 0;
+                totalHrg += a.hargaJual! * (a.pcs ?? 0);
                 totalQty += a.pcs ?? 0;
               }
 
