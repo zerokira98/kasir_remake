@@ -23,15 +23,19 @@ class _InsertProductPageState extends State<InsertProductPage> {
                 var state =
                     (BlocProvider.of<StockBloc>(context).state as StockLoaded);
 
-                bool valids = state.data.every(
-                    (element) => element.formkey!.currentState!.validate());
-                if (valids) {
-                  print('valids');
-                  BlocProvider.of<StockBloc>(context)
-                      .add(UploadtoDB(state.data));
-                } else {
-                  print('not valid');
-                }
+                // bool valids = state.data.isNotEmpty
+                //     ? state.data.every(
+                //         (element) => element.formkey!.currentState!.validate())
+                //     : false;
+                // if (valids) {
+                //   print('valids');
+                BlocProvider.of<StockBloc>(context).add(UploadtoDB(state.data));
+                // } else {
+                //   print('not valid');
+                //   // if (state.data.isEmpty)
+                //   //   BlocProvider.of<StockBloc>(context)
+                //   //       .add(StockInitialize(success: false));
+                // }
               },
               child: Container(
                   // width: 56,
@@ -40,16 +44,24 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   margin: EdgeInsets.all(4.0),
                   padding: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent[700],
+                    color: Colors.green[200],
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     // mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      BlocBuilder<StockBloc, StockState>(
+                        builder: (context, state) {
+                          if (state is StockLoading) {
+                            return CircularProgressIndicator();
+                          }
+                          return Container();
+                        },
+                      ),
                       Text(
                         'Submit',
-                        textScaleFactor: 1.1,
-                        style: TextStyle(color: Colors.white),
+                        textScaleFactor: 1.2,
+                        style: TextStyle(color: Colors.black),
                         textAlign: TextAlign.center,
                       ),
                       Icon(

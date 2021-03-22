@@ -1,9 +1,8 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/listviewof_item.dart';
 import 'package:kasir_remake/msc/db.dart';
+import 'package:kasir_remake/page/stockview.dart';
 
 class DebugPage extends StatelessWidget {
   @override

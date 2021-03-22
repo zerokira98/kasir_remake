@@ -74,6 +74,14 @@ CREATE TABLE `tempat_beli` (
   `NAMA` varchar(50) NOT NULL,
   `DESC` varchar(64) NULL
 );''');
+        await db.execute('''
+CREATE TABLE `change_history` (
+  `ID` integer primary key autoincrement,
+  `type` CHARACTER(8) NOT NULL,
+  `table` varchar(24) NOT NULL,
+  `content` varchar(64) NOT NULL,
+  `reason` varchar(64) NULL
+);''');
         await db.insert('tempat_beli', {'NAMA': '', 'DESC': 'Diisi Kosong'});
       });
       isInitialized = !isInitialized;
@@ -88,90 +96,6 @@ class DatabaseRepository {
   // Database _db;
 
   DatabaseRepository(this.databaseProvider);
-  // DBHelper() {
-  //   if (_db == null) {
-  //     _initDatabase().then((db) {
-  //       _db = db;
-  //     });
-  //     // return _db;
-  //   }
-  //   // else {
-  //   //   // return _db;
-  //   // }
-  // }
-  // DBHelper._();
-  // static final DBHelper instance = DBHelper._();
-  // <Database> get db  {
-  // if (_db == null) {
-  //   _db = await _initDatabase();
-  //   return _db;
-  // } else {
-  //   return _db;
-  // }
-  // }
-
-//   Future<Database> _initDatabase() async {
-//     String dir = await getDatabasesPath();
-//     String path = join(dir, _dbName);
-//     // try {
-//     return await openDatabase(path, version: _dbVersion,
-//         onCreate: (db, _dbversion) async {
-//       // `ID_LOG` int NOT NULL,
-//       await db.execute('''
-//         CREATE TABLE add_stock (
-//       ID integer primary key autoincrement,
-//   PRICE decimal(10,0) NOT NULL,
-//   QTY int NOT NULL,
-//   EXP date DEFAULT NULL,
-//   ADD_DATE timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//   ID_BRG int  NULL,
-//   SUPPLIER int NULL,
-//   FOREIGN KEY(SUPPLIER) REFERENCES tempat_beli(ID)
-//   );
-//         ''');
-//       await db.execute('''
-// CREATE TABLE `items` (
-//       `ID` integer primary key autoincrement,
-//   `NAMA` varchar(50) NOT NULL,
-//   `BARCODE` int DEFAULT NULL,
-//   `JUMLAH` smallint NOT NULL,
-//   `EXP_DATE` date DEFAULT NULL,
-//   `TGL_POSTING` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//   `HARGA_JUAL` decimal(10,0) NOT NULL
-// ) ;''');
-//       await db.execute('''
-// CREATE TABLE `transactions` (
-//   `ID` integer primary key autoincrement,
-//   `NAMA` varchar(10) NOT NULL,
-//   `TANGGAL` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-// );
-// ''');
-//       await db.execute('''
-// CREATE TABLE `transactions_items` (
-//   `TR_ID` integer,
-//   `PRODUCT_ID` int NOT NULL,
-//   `QTY` smallint NOT NULL
-// );''');
-//       await db.execute('''
-// CREATE TABLE `price_log` (
-//       `ID` integer ,
-//       `PRODUCT_ID` int NOT NULL,
-//   `PRICE` decimal(10,0) NOT NULL,
-//   `DATE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-// );''');
-//       await db.execute('''
-// CREATE TABLE `tempat_beli` (
-//   `ID` integer primary key autoincrement,
-//   `NAMA` varchar(50) NOT NULL,
-//   `DESC` varchar(64) NULL
-// );''');
-//       await db.insert('tempat_beli', {'NAMA': '', 'DESC': 'Diisi Kosong'});
-//     });
-//     // return a;
-//     // } catch (e) {
-//     //   print(e);
-//     // }
-//   }
 
   test() async {
     Database database = await databaseProvider.db();
@@ -283,6 +207,26 @@ class DatabaseRepository {
     // String sql = '''SELECT name FROM PRAGMA_TABLE_INFO('price_log');''';
     var result = await database.rawQuery(sql);
     print(result);
+  }
+
+  deleteStock(String id) async {
+    Database database = await databaseProvider.db();
+    // String sql = '''''';
+    String content;
+    var a = await database.query('add_stock', where: 'ID=?', whereArgs: [id]);
+    if (a.isNotEmpty) {
+      content = a[0].toString();
+      try {
+        await database.delete('add_stock', where: 'ID =?', whereArgs: [id]);
+        await database.insert('change_history', {
+          'type': 'delete',
+          'table': 'add_stock',
+          'content': content,
+        });
+      } catch (e) {
+        throw Exception;
+      }
+    }
   }
 
   Future<List> showInsideItems({String? barcode, String? query}) async {

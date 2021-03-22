@@ -11,8 +11,8 @@ class TransactionItemCard extends StatefulWidget {
   Key? get key => _key;
   final Key? _key;
 
-  final ItemTr? item;
-  TransactionItemCard({this.item, Key? key}) : _key = key;
+  final ItemTr item;
+  TransactionItemCard({required this.item, Key? key}) : _key = key;
 
   @override
   _TransactionItemCardState createState() => _TransactionItemCardState();
@@ -30,7 +30,7 @@ class _TransactionItemCardState extends State<TransactionItemCard>
 
   final hargaSatuan = TextEditingController();
 
-  Future? delayQty;
+  // Future? delayQty;
 
   var barcodeC = TextEditingController();
   @override
@@ -39,13 +39,14 @@ class _TransactionItemCardState extends State<TransactionItemCard>
     return BlocBuilder<TransactionBloc, TransactionState>(
       builder: (context, state) {
         if (state is TransactionLoaded) {
-          print(widget.item!.name);
+          print(widget.item.name);
           // namaC.text = widget.item.name ?? '';
-          if (namaC.text != widget.item!.name?.toString())
-            namaC.text = widget.item!.name?.toString() ?? '';
-          hargaSatuan.text = widget.item!.hargaJual?.toString() ?? '';
-          if (qtyC.text != widget.item!.pcs?.toString())
-            qtyC.text = widget.item!.pcs?.toString() ?? '';
+          if (namaC.text != widget.item.name?.toString())
+            namaC.text = widget.item.name?.toString() ?? '';
+          hargaSatuan.text = widget.item.hargaJual?.toString() ?? '';
+          barcodeC.text = widget.item.barcode?.toString() ?? '';
+          if (qtyC.text != widget.item.pcs?.toString())
+            qtyC.text = widget.item.pcs?.toString() ?? '';
           totalC.text = qtyC.text.isNotEmpty && hargaSatuan.text.isNotEmpty
               ? (int.parse(qtyC.text) * int.parse(hargaSatuan.text)).toString()
               : '';
@@ -84,10 +85,10 @@ class _TransactionItemCardState extends State<TransactionItemCard>
                           totalC.text = (suggestion['HARGA_JUAL']).toString();
                           print('product id: ${suggestion['ID']}');
                           BlocProvider.of<TransactionBloc>(context)
-                              .add(UpdateItem(widget.item!.copywith(
+                              .add(UpdateItem(widget.item.copywith(
                             name: suggestion['NAMA'],
                             pcs: 1,
-                            barcode: suggestion['BARCODE'] ?? '',
+                            barcode: suggestion['BARCODE']?.toString() ?? '',
                             productId: suggestion['ID'],
                             hargaJual: suggestion['HARGA_JUAL'],
                           )));
@@ -103,7 +104,7 @@ class _TransactionItemCardState extends State<TransactionItemCard>
                           onChanged: (s) {
                             BlocProvider.of<TransactionBloc>(context).add(
                                 UpdateItem(
-                                    widget.item!.copywith(name: namaC.text)));
+                                    widget.item.copywith(name: namaC.text)));
                           },
                           controller: namaC,
                           decoration:
@@ -130,7 +131,7 @@ class _TransactionItemCardState extends State<TransactionItemCard>
                                     .showInsideItems(barcode: barcodeScan);
                                 if (search.isNotEmpty) {
                                   BlocProvider.of<TransactionBloc>(context)
-                                      .add(UpdateItem(widget.item!.copywith(
+                                      .add(UpdateItem(widget.item.copywith(
                                     name: search[0]!['NAMA'],
                                     pcs: 1,
                                     barcode: search[0]!['BARCODE'].toString(),
@@ -157,7 +158,7 @@ class _TransactionItemCardState extends State<TransactionItemCard>
                                     .toString();
                             BlocProvider.of<TransactionBloc>(context).add(
                                 UpdateItem(
-                                    widget.item!.copywith(pcs: int.parse(s))));
+                                    widget.item.copywith(pcs: int.parse(s))));
                           }
                         },
                         decoration: InputDecoration(labelText: 'Qty'),
@@ -191,7 +192,7 @@ class _TransactionItemCardState extends State<TransactionItemCard>
                   duration: Duration(milliseconds: 500),
                   curve: Curves.ease,
                   vsync: this,
-                  child: widget.item!.open!
+                  child: widget.item.open!
                       ? theWidget
                       : Container(
                           height: 2,

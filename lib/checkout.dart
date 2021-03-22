@@ -20,10 +20,14 @@ class CheckOutTr extends StatelessWidget {
         child: BlocBuilder<TransactionBloc, TransactionState>(
           builder: (context, state) {
             if (state is TransactionLoaded) {
+              if (state.data.isEmpty)
+                return Center(
+                  child: Text('Nodata'),
+                );
               print(state.data);
-              var totalHrg = 0, totalQty = 0;
+              int totalHrg = 0, totalQty = 0;
               for (var a in state.data) {
-                totalHrg += a.hargaJual! * (a.pcs ?? 0);
+                totalHrg += (a.hargaJual ?? 0) * (a.pcs ?? 0);
                 totalQty += a.pcs ?? 0;
               }
 

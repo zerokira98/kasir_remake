@@ -41,6 +41,10 @@ class DeleteEntry extends StockEvent {
 }
 
 class StockInitialize extends StockEvent {
-  final bool? success;
-  StockInitialize({this.success});
+  final bool success;
+  StockInitialize({required this.success});
+
+  // @override
+  // List<Object> get props => [success];
+
 }

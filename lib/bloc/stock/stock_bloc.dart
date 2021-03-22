@@ -34,7 +34,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
               id: Random().nextInt(510),
               // formkey: GlobalKey<FormState>(),
               ditambahkan: DateTime.now().toUtc(),
-              expdate: DateTime.now().add(Duration(days: 690)),
+              expdate: DateTime.now().add(Duration(days: 600)),
               open: false)
         ], success: event.success);
         await Future.delayed(Duration(seconds: 1), () async* {
@@ -49,6 +49,13 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       }
     }
     if (state is StockLoaded) {
+      // if (event is StockInitialize) {
+      //   if (event.success) {
+      //   } else {
+      //     yield StockInitial();
+      //     add(StockInitialize(success: false));
+      //   }
+      // }
       if (event is OnDataChanged) {
         yield StockLoaded((state as StockLoaded)
             .data
@@ -57,22 +64,35 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       }
       if (event is UploadtoDB) {
         var data = (state as StockLoaded).data;
+        // var state =
+        //             (BlocProvider.of<StockBloc>(context).state as StockLoaded);
+        bool valids = data.isNotEmpty
+            ? data.every((element) => element.formkey!.currentState!.validate())
+            : false;
         // verify(data);
         // if (data.any((e) => e.formkey.currentState.validate())) {
         //   yield StockLoaded(data, error: {'msg': 'data tidak valid'});
         //   await Future.delayed(Duration(seconds: 4));
         //   yield StockLoaded(data, error: null);
         // } else {
-        yield (StockLoading());
-        await Future.delayed(Duration(seconds: 1));
-        try {
-          await _dbHelper.addItem(data);
-          yield StockInitial();
-          add(StockInitialize(success: true));
-        } catch (e) {
-          yield StockLoaded(data, error: {'msg': e.toString()});
+        if (valids) {
+          yield (StockLoading());
           await Future.delayed(Duration(seconds: 1));
-          yield (state as StockLoaded).clearMsg();
+          try {
+            await _dbHelper.addItem(data);
+            yield StockInitial();
+            add(StockInitialize(success: true));
+          } catch (e) {
+            yield StockLoaded(data, error: {'msg': e.toString()});
+            await Future.delayed(Duration(seconds: 1));
+            yield (state as StockLoaded).clearMsg();
+          }
+        } else if (data.isEmpty) {
+          print('error no data');
+          // yield (StockLoading());
+          // await Future.delayed(Duration(seconds: 2));
+          yield StockInitial();
+          add(StockInitialize(success: false));
         }
         // }
       }
