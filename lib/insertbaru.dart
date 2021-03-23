@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -236,8 +237,6 @@ class _InsertProductCardState extends State<InsertProductCard>
               enabled: false,
               onTap: () async {
                 FocusScope.of(context).unfocus();
-
-                FocusScope.of(context).unfocus();
               },
               keyboardType: TextInputType.datetime,
               decoration: InputDecoration(labelText: 'Buy date'),
@@ -249,18 +248,28 @@ class _InsertProductCardState extends State<InsertProductCard>
             controller: barcodeC,
             decoration: InputDecoration(
                 labelText: 'barcode',
-                suffixIcon: InkWell(
-                    onTap: () async {
-                      String barcodeScan =
-                          await FlutterBarcodeScanner.scanBarcode(
-                              '#ffffff', 'Cancel', false, ScanMode.BARCODE);
-                      print(barcodeScan);
-                      barcodeC!.text = barcodeScan;
+                suffixIcon: FutureBuilder<List>(
+                    future: availableCameras(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data!.isEmpty)
+                        return Container();
+                      return InkWell(
+                          onTap: () async {
+                            String barcodeScan =
+                                await FlutterBarcodeScanner.scanBarcode(
+                                    '#ffffff',
+                                    'Cancel',
+                                    false,
+                                    ScanMode.BARCODE);
+                            print(barcodeScan);
+                            barcodeC!.text = barcodeScan;
 
-                      BlocProvider.of<StockBloc>(context).add(OnDataChanged(
-                          widget.data.copywith(barcode: barcodeScan)));
-                    },
-                    child: Icon(Icons.qr_code))),
+                            BlocProvider.of<StockBloc>(context).add(
+                                OnDataChanged(widget.data
+                                    .copywith(barcode: barcodeScan)));
+                          },
+                          child: Icon(Icons.qr_code));
+                    })),
           ),
         ),
         Expanded(

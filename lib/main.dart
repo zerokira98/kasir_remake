@@ -1,5 +1,3 @@
-
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +14,13 @@ import 'package:kasir_remake/transaksipage.dart';
 import 'package:bloc/bloc.dart';
 import 'package:kasir_remake/pulsa.dart';
 
-void main() {
-  EquatableConfig.stringify = kDebugMode;
+void main() async {
+  // Ensure that plugin services are initialized so that `availableCameras()`
+// can be called before `runApp()`
+  WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = NewBlocObserver();
+  EquatableConfig.stringify = kDebugMode;
+
   runApp(MyApp());
 }
 

@@ -20,7 +20,7 @@ class ListOfStockItems extends StatelessWidget {
               }),
           Builder(
             builder: (context) => IconButton(
-                icon: Icon(Icons.open_in_new),
+                icon: Icon(Icons.filter_alt),
                 onPressed: () {
                   // BlocProvider.of<StockviewBloc>(context).add(Initializeview());
                   Scaffold.of(context).showBottomSheet(
@@ -50,6 +50,7 @@ class ListOfStockItems extends StatelessWidget {
               child: BlocBuilder<StockviewBloc, StockviewState>(
                   builder: (context, state) {
                 if (state is StockviewLoaded) {
+                  if (state.data.isEmpty) Center(child: Text('Empty!'));
                   return ListView.builder(
                     itemBuilder: (context, i) {
                       ItemTr data = state.data[i];
@@ -82,7 +83,7 @@ class ListOfStockItems extends StatelessWidget {
                             ]),
 
                           ///------
-                          StockviewCard(data),
+                          StockviewCard(data, Key(data.id.toString())),
                         ],
                       );
                     },
@@ -100,8 +101,12 @@ class ListOfStockItems extends StatelessWidget {
 }
 
 class StockviewCard extends StatefulWidget {
+  @override
+  Key get key => _key;
+  final Key _key;
+
   final ItemTr data;
-  StockviewCard(this.data);
+  StockviewCard(this.data, this._key);
 
   @override
   _StockviewCardState createState() => _StockviewCardState();
@@ -162,14 +167,45 @@ class _StockviewCardState extends State<StockviewCard> {
             ),
           ),
           Positioned.fill(
-              child: Center(
-            child: InkWell(
-                onTap: () {
-                  setState(() {
-                    horizontal = 0.0;
-                  });
-                },
-                child: Text('center hehe')),
+              child: Container(
+            margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
+            child: Center(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Are you sure want to delete?',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                        onTap: () {
+                          BlocProvider.of<StockviewBloc>(context)
+                              .add(DeleteEntry(widget.data));
+                        },
+                        child:
+                            Text('Yes', style: TextStyle(color: Colors.white))),
+                  ),
+                  InkWell(
+                      onTap: () {
+                        setState(() {
+                          horizontal = 0.0;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Cancel',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                ],
+              ),
+            ),
           )),
           AnimatedContainer(
             duration: Duration(milliseconds: 450),

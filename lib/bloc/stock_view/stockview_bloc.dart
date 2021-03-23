@@ -37,10 +37,16 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           hargaBeli: e['PRICE'],
           hargaJual: e['HARGA_JUAL'],
           tempatBeli: e['SUPPLIER'],
-          // id: ,
+          id: e['STOCK_ID'],
         );
       }).toList();
       yield StockviewLoaded(convert, Filter());
+    }
+    if (event is DeleteEntry) {
+      try {
+        await _dbHelper.deleteStock(event.data.id.toString());
+        add(Initializeview());
+      } catch (e) {}
     }
     if (event is FilterChange) {
       yield StockviewLoading();

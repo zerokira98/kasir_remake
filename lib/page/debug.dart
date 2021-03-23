@@ -40,7 +40,7 @@ class DebugPage extends StatelessWidget {
             child: Text('press inside add_stock'),
             onPressed: () {
               RepositoryProvider.of<DatabaseRepository>(context)
-                  .showInsideStock();
+                  .showInsideStock(showName: true);
             },
           ),
           ElevatedButton(

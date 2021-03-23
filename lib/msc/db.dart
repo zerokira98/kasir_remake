@@ -278,10 +278,15 @@ class DatabaseRepository {
       } else if (showname == true) {
         String filterString =
             '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ?''';
-        sql = '''SELECT *,items.NAMA AS NAMA,tempat_beli.NAMA AS SUPPLIER FROM add_stock LEFT JOIN items ON items.ID = add_stock.ID_BRG ''' +
+        sql = '''SELECT *,items.NAMA AS NAMA,tempat_beli.NAMA AS SUPPLIER,add_stock.ID AS STOCK_ID 
+        FROM add_stock 
+        LEFT JOIN items ON items.ID = add_stock.ID_BRG ''' +
             ''' LEFT JOIN tempat_beli ON tempat_beli.ID=add_stock.SUPPLIER ''' +
             filterString;
         result = await database.rawQuery(sql, ['%$name%', startDate, endDate]);
+      } else {
+        sql = '''SELECT * FROM add_stock''';
+        result = await database.rawQuery(sql);
       }
 
       print(result);

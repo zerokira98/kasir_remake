@@ -1,5 +1,3 @@
-
-
 part of 'stockview_bloc.dart';
 
 abstract class StockviewEvent extends Equatable {
@@ -25,4 +23,9 @@ class ReloadView extends StockviewEvent {
   // var dateStart, dateEnd, name, sortBy;
   // @override
   // List<Object> get props => [];
+}
+
+class DeleteEntry extends StockviewEvent {
+  final ItemTr data;
+  DeleteEntry(this.data);
 }
