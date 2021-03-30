@@ -116,30 +116,30 @@ class DebugPage extends StatelessWidget {
                   });
             },
           ),
-          // ElevatedButton(
-          //   child: Text('Test terminal'),
-          //   onPressed: () {
-          //     Map a = {
-          //       'abc': {
-          //         'def': {'def1', 'def2', 'def3'},
-          //         'ghi': {'ghi1', 'ghi2'}
-          //       }
-          //     };
-          //     for (var b in a['abc'].values) {
-          //       print(b);
-          //     }
-          //     // a['abc'].forEach((key, value) {
-          //     //   print('key :' + key);
-          //     //   print('value :' + value.toString());
-          //     // });
-          //     // RepositoryProvider.of<DBHelper>(context).showPlaces();
-          //     // print(DateTime.now());
-          //     // Navigator.push(
-          //     //     context,
-          //     //     MaterialPageRoute(
-          //     //         builder: (context) => ListOfStockItems()));
-          //   },
-          // ),
+          ElevatedButton(
+            child: Text('Test terminal'),
+            onPressed: () {
+              // Map a = {
+              //   'abc': {
+              //     'def': {'def1', 'def2', 'def3'},
+              //     'ghi': {'ghi1', 'ghi2'}
+              //   }
+              // };
+              // for (var b in a['abc'].values) {
+              //   print(b);
+              // }
+              // a['abc'].forEach((key, value) {
+              //   print('key :' + key);
+              //   print('value :' + value.toString());
+              // });
+              RepositoryProvider.of<DatabaseRepository>(context).showPlaces();
+              // print(DateTime.now());
+              // Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => ListOfStockItems()));
+            },
+          ),
         ],
       ),
     );

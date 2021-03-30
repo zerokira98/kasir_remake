@@ -151,6 +151,7 @@ class _StockviewCardState extends State<StockviewCard> {
     var hargaBeli = numFormat.format(widget.data.hargaBeli);
     var hargaJual = numFormat.format(widget.data.hargaJual);
     var totalBeli = numFormat.format(widget.data.pcs! * widget.data.hargaBeli!);
+    print('tempat:' + (widget.data.tempatBeli ?? ''));
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
         print(details.delta);
@@ -424,12 +425,14 @@ class FilterBox extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
+                          print(dateTo.text);
                           // print(namaBarang.text + dateFromFull + dateToFull);
                           BlocProvider.of<StockviewBloc>(context)
-                              .add(FilterChange(name: namaBarang.text, page: 0
-                                  // dateStart: dateFromFull,
-                                  // dateEnd: dateToFull,
-                                  ));
+                              .add(FilterChange(
+                            name: namaBarang.text, page: 0,
+                            // dateStart: dateFromFull,
+                            dateEnd: dateTo.text,
+                          ));
 
                           Navigator.pop(context);
                         },

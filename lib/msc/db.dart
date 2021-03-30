@@ -21,7 +21,7 @@ class DatabaseProvider {
 
   Future closeDb() async {
     String? dir = await getDatabasesPath();
-    String path = join(dir!, _dbName);
+    String path = join(dir, _dbName);
     await deleteDatabase(path);
     // _db = null;
     isInitialized = false;
@@ -29,7 +29,7 @@ class DatabaseProvider {
   }
 
   Future _init() async {
-    String dir = await (getDatabasesPath() as FutureOr<String>);
+    String dir = await (getDatabasesPath());
     String path = join(dir, _dbName);
     try {
       _db = await openDatabase(path, version: _dbVersion,
@@ -182,6 +182,8 @@ class DatabaseRepository {
         if (checkPlace.isEmpty) {
           placeId =
               await database.insert('tempat_beli', {'NAMA': item.tempatBeli});
+        } else {
+          placeId = checkPlace[0]['ID'] as int;
         }
         String sql2 =
             '''INSERT INTO add_stock(PRICE,QTY,ID_BRG,EXP,SUPPLIER,ADD_DATE) VALUES(?,?,?,?,?,?)''';
@@ -274,10 +276,12 @@ class DatabaseRepository {
       bool? showName,
       String? endDate,
       required int page}) async {
-    name = name ?? ' ';
+    name = name ?? '';
     startDate =
         startDate ?? DateTime.now().subtract(Duration(days: 5110)).toString();
-    endDate = endDate ?? DateTime.now().add(Duration(days: 5110)).toString();
+    print(endDate);
+    endDate = endDate ?? DateTime.now().add(Duration(days: 50)).toString();
+    print(endDate);
     bool showname = showName ?? false;
     List result = [];
     String sql;
@@ -289,13 +293,14 @@ class DatabaseRepository {
       } else if (showname == true) {
         String filterString =
             '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ? LIMIT 10 OFFSET ?''';
-        sql = '''SELECT *,items.NAMA AS NAMA,tempat_beli.NAMA AS SUPPLIER,add_stock.ID AS STOCK_ID 
+        sql = '''SELECT *,items.NAMA AS NAMA,tempat_beli.NAMA AS SUPPLIER,add_stock.ID AS STOCK_ID,
+        tempat_beli.ID AS TEMPAT_ID 
         FROM add_stock 
         LEFT JOIN items ON items.ID = add_stock.ID_BRG ''' +
             ''' LEFT JOIN tempat_beli ON tempat_beli.ID=add_stock.SUPPLIER ''' +
             filterString;
         result = await database
-            .rawQuery(sql, ['%$name%', startDate, endDate, page * 10]);
+            .rawQuery(sql, ['%$name%', startDate, endDate, (page * 10)]);
       } else {
         sql = '''SELECT * FROM add_stock''';
         result = await database.rawQuery(sql);
