@@ -1,8 +1,12 @@
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/bloc/stock_view/stockview_bloc.dart';
 import 'package:kasir_remake/listviewof_item.dart';
 import 'package:kasir_remake/msc/db.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:kasir_remake/page/stockview.dart';
 
 class DebugPage extends StatelessWidget {
@@ -10,7 +14,7 @@ class DebugPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Debug page'),
+        title: Text('misc'),
       ),
       body: ListView(
         padding: EdgeInsets.all(8.0),
@@ -65,26 +69,6 @@ class DebugPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ListOfItems()));
-              // RepositoryProvider.of<DBHelper>(context).test();
-              // List numb = [1, 2, 3, 4];
-              // var numb2 = numb;
-              // numb2.removeLast();
-              // List<Map<String, dynamic>> a = [
-              //   {
-              //     'nama': 'nick',
-              //     'umur': 22,
-              //   },
-              //   {
-              //     'nama': 'rick',
-              //     'umur': 24,
-              //   },
-              // ];
-              // var b = a[0];
-              // b.remove('umur');
-              // print(numb);
-              // print(numb2);
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => FormInsert()));
             },
           ),
           Padding(
@@ -99,6 +83,37 @@ class DebugPage extends StatelessWidget {
               BlocProvider.of<StockviewBloc>(context).add(Initializeview());
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ListOfStockItems()));
+            },
+          ),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+          ),
+          ElevatedButton(
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Text('Print Monthly Stock'),
+            ),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text('Alert'),
+                      actions: [
+                        TextButton(
+                            onPressed: () async {
+                              var a = await getApplicationDocumentsDirectory();
+                              File theFile = File(a.path);
+                              var b = ListToCsvConverter().convert([
+                                ['Nama', 'Umur', 'Sex'],
+                                ['Rizal', '21', 'Male'],
+                              ]);
+                              theFile.writeAsStringSync(b);
+                            },
+                            child: Text('Print March'))
+                      ],
+                    );
+                  });
             },
           ),
           // ElevatedButton(

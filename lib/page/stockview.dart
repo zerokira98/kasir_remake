@@ -10,6 +10,34 @@ class ListOfStockItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: Container(
+        color: Colors.red,
+        child: BlocBuilder<StockviewBloc, StockviewState>(
+          builder: (context, state) {
+            if (state is StockviewLoaded) {
+              return Row(
+                children: [
+                  Expanded(child: Container()),
+                  Icon(Icons.arrow_left),
+                  Container(
+                    width: 50,
+                    color: Colors.blue,
+                    child: Center(
+                        child: Text(
+                      state.currentPage.toString(),
+                      textScaleFactor: 1.6,
+                    )),
+                  ),
+                  Icon(Icons.arrow_right),
+                  Expanded(child: Container()),
+                ],
+              );
+            }
+            return Container();
+          },
+        ),
+        height: 50,
+      ),
       appBar: AppBar(
         title: Text('Histori tambah stock'),
         actions: [
@@ -55,6 +83,7 @@ class ListOfStockItems extends StatelessWidget {
                     return Center(child: Text('Empty!'));
                   }
                   return ListView.builder(
+                    padding: EdgeInsets.only(bottom: 12),
                     itemBuilder: (context, i) {
                       ItemTr data = state.data[i];
 
@@ -260,7 +289,7 @@ class FilterBox extends StatelessWidget {
     return BlocBuilder<StockviewBloc, StockviewState>(
       builder: (context, state) {
         if (state is StockviewLoaded) {
-          namaBarang.text = state.filter.nama ?? 'a';
+          namaBarang.text = state.filter.nama ?? '';
           return Container(
             // color: Colors.blue,
             // margin: EdgeInsets.all(18.0),
@@ -397,11 +426,10 @@ class FilterBox extends StatelessWidget {
                         onPressed: () {
                           // print(namaBarang.text + dateFromFull + dateToFull);
                           BlocProvider.of<StockviewBloc>(context)
-                              .add(FilterChange(
-                            name: namaBarang.text,
-                            // dateStart: dateFromFull,
-                            // dateEnd: dateToFull,
-                          ));
+                              .add(FilterChange(name: namaBarang.text, page: 0
+                                  // dateStart: dateFromFull,
+                                  // dateEnd: dateToFull,
+                                  ));
 
                           Navigator.pop(context);
                         },

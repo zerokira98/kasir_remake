@@ -21,7 +21,8 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     StockviewEvent event,
   ) async* {
     if (event is Initializeview) {
-      List<dynamic> dbres = await (_dbHelper.showInsideStock(showName: true));
+      List<dynamic> dbres =
+          await (_dbHelper.showInsideStock(showName: true, page: 0));
       List<ItemTr> convert = dbres.map<ItemTr>((e) {
         var dateDb = e['ADD_DATE'].toString();
         bool isUtc = dateDb.contains('Z');
@@ -40,7 +41,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           id: e['STOCK_ID'],
         );
       }).toList();
-      yield StockviewLoaded(convert, Filter());
+      yield StockviewLoaded(convert, Filter(), currentPage: 0);
     }
     if (event is DeleteEntry) {
       try {
@@ -56,7 +57,8 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           showName: true,
           name: event.name,
           startDate: event.dateStart,
-          endDate: event.dateEnd));
+          endDate: event.dateEnd,
+          page: event.page));
       List<ItemTr> convert = dbres.map<ItemTr>((e) {
         var dateDb = e['ADD_DATE'].toString();
         bool isUtc = dateDb.contains('Z');
@@ -75,7 +77,8 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           // id: ,
         );
       }).toList();
-      yield StockviewLoaded(convert, Filter(nama: event.name));
+      yield StockviewLoaded(convert, Filter(nama: event.name),
+          currentPage: event.page);
     }
   }
 }

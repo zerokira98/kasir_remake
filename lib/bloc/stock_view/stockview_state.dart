@@ -14,7 +14,8 @@ class StockviewLoading extends StockviewState {}
 class StockviewLoaded extends StockviewState {
   final List<ItemTr> data;
   final Filter filter;
-  StockviewLoaded(this.data, this.filter);
+  final int currentPage;
+  StockviewLoaded(this.data, this.filter, {required this.currentPage});
   @override
   List<Object> get props => [data];
 }

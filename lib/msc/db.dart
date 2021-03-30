@@ -272,7 +272,8 @@ class DatabaseRepository {
       String? name,
       String? startDate,
       bool? showName,
-      String? endDate}) async {
+      String? endDate,
+      required int page}) async {
     name = name ?? ' ';
     startDate =
         startDate ?? DateTime.now().subtract(Duration(days: 5110)).toString();
@@ -287,13 +288,14 @@ class DatabaseRepository {
         result = await database.rawQuery(sql, [idbarang]);
       } else if (showname == true) {
         String filterString =
-            '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ?''';
+            '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ? LIMIT 10 OFFSET ?''';
         sql = '''SELECT *,items.NAMA AS NAMA,tempat_beli.NAMA AS SUPPLIER,add_stock.ID AS STOCK_ID 
         FROM add_stock 
         LEFT JOIN items ON items.ID = add_stock.ID_BRG ''' +
             ''' LEFT JOIN tempat_beli ON tempat_beli.ID=add_stock.SUPPLIER ''' +
             filterString;
-        result = await database.rawQuery(sql, ['%$name%', startDate, endDate]);
+        result = await database
+            .rawQuery(sql, ['%$name%', startDate, endDate, page * 10]);
       } else {
         sql = '''SELECT * FROM add_stock''';
         result = await database.rawQuery(sql);

@@ -14,7 +14,13 @@ class Initializeview extends StockviewEvent {
 
 class FilterChange extends StockviewEvent {
   final dateStart, dateEnd, name, sortBy;
-  FilterChange({this.name, this.dateStart, this.dateEnd, this.sortBy});
+  final int page;
+  FilterChange(
+      {this.name,
+      this.dateStart,
+      this.dateEnd,
+      this.sortBy,
+      required this.page});
   // @override
   // List<Object> get props => [];
 }

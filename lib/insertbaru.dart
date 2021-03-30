@@ -385,10 +385,9 @@ class _InsertProductCardState extends State<InsertProductCard>
                       );
                     },
                     onSuggestionSelected: (dynamic suggestion) async {
-                      List res =
-                          await RepositoryProvider.of<DatabaseRepository>(
-                                  context)
-                              .showInsideStock(idbarang: suggestion['ID']);
+                      List res = await RepositoryProvider.of<
+                              DatabaseRepository>(context)
+                          .showInsideStock(idbarang: suggestion['ID'], page: 0);
                       // print(res);
                       BlocProvider.of<StockBloc>(context)
                           .add(OnDataChanged(widget.data.copywith(
@@ -533,30 +532,6 @@ class _InsertProductCardState extends State<InsertProductCard>
       ),
     );
   }
-
-  validate(name, priceBuy, priceSell, qty, place, expdate) {
-    // _formkey.currentState.validate();
-    // if (name.legth == 0)
-    //   return {'error': ERROR.NAME, 'error_msg': 'invalid Name'};
-  }
-
-  // void submit() {
-  //   var name = namec.text;
-  //   var priceBuy = hargaBeli.text.isNotEmpty ? hargaBeli.text : '';
-  //   var priceSell = hargaJual.text.isNotEmpty ? hargaJual.text : '';
-  //   var qty = qtyc.text;
-  //   var expdate = datec.text.isNotEmpty ? datec.text : 'none';
-  //   var place = placec.text.isNotEmpty ? placec.text : 'none';
-  //   validate(name, priceBuy, priceSell, qty, place, expdate);
-  //   var dataFinal = ItemTr(
-  //     name: name,
-  //     hargaBeli: int.parse(priceBuy),
-  //     hargaJual: int.parse(priceSell),
-  //     pcs: int.parse(qty),
-  //     tempatBeli: place,
-  //   );
-  // BlocProvider.of<StockBloc>(context).add(UploadtoDB(dataFinal));
-  // }
 }
 
 class AnimatedClipRect extends StatefulWidget {
