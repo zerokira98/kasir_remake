@@ -152,6 +152,7 @@ class _EditItemPageState extends State<EditItemPage>
                                   if (text!.length <= 2) {
                                     return '3 or more character';
                                   }
+
                                   return null;
                                 },
                                 suggestionsBoxController: sbc,

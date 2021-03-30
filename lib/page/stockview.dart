@@ -31,12 +31,13 @@ class ListOfStockItems extends StatelessWidget {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Container(color: Colors.black26)),
+                                    child:
+                                        Container(color: Colors.transparent)),
                               ),
                               FilterBox(),
                             ],
                           ),
-                      backgroundColor: Colors.transparent);
+                      backgroundColor: Colors.black26);
                 }),
           )
         ],
@@ -50,7 +51,9 @@ class ListOfStockItems extends StatelessWidget {
               child: BlocBuilder<StockviewBloc, StockviewState>(
                   builder: (context, state) {
                 if (state is StockviewLoaded) {
-                  if (state.data.isEmpty) Center(child: Text('Empty!'));
+                  if (state.data.isEmpty) {
+                    return Center(child: Text('Empty!'));
+                  }
                   return ListView.builder(
                     itemBuilder: (context, i) {
                       ItemTr data = state.data[i];
@@ -257,6 +260,7 @@ class FilterBox extends StatelessWidget {
     return BlocBuilder<StockviewBloc, StockviewState>(
       builder: (context, state) {
         if (state is StockviewLoaded) {
+          namaBarang.text = state.filter.nama ?? 'a';
           return Container(
             // color: Colors.blue,
             // margin: EdgeInsets.all(18.0),
@@ -318,6 +322,7 @@ class FilterBox extends StatelessWidget {
                                   DateTime.now().subtract(Duration(days: 365)),
                               lastDate:
                                   DateTime.now().add(Duration(days: 365)));
+
                           dateFrom.text =
                               selectedDate.toString().substring(0, 10);
                           // dateFromFull = selectedDate.toString();
@@ -397,6 +402,8 @@ class FilterBox extends StatelessWidget {
                             // dateStart: dateFromFull,
                             // dateEnd: dateToFull,
                           ));
+
+                          Navigator.pop(context);
                         },
                         child: Text('Go'),
                       ),

@@ -81,14 +81,14 @@ class ItemTr extends Equatable {
 
   static ItemTr fromMap(Map data) {
     return ItemTr(
-      barcode: data['BARCODE'].toString(),
+      barcode: data['BARCODE']?.toString(),
       // open: data[''],
       name: data['NAMA'],
       // formkey: formkey ?? this.formkey,
-      productId: data['ID_BRG'],
+      productId: data['ID'],
       expdate: DateTime.parse(data['EXP_DATE']),
-      ditambahkan: DateTime.parse(data['ADD_DATE']),
-      hargaBeli: data['HARGA_BELI'],
+      // ditambahkan: DateTime.parse(data['ADD_DATE']),
+      // hargaBeli: data['HARGA_BELI'],
       hargaJual: data['HARGA_JUAL'],
       pcs: data['JUMLAH'],
       // tempatBeli: data['SUPPLIER'],

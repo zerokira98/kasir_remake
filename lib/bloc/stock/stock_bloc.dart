@@ -19,7 +19,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
     ///do smg
     add(StockInitialize(success: false));
   }
-  verify(List<ItemTr> data) {
+  bool verify(List<ItemTr> data) {
     return data.any((e) => e.name != null);
   }
 
@@ -40,22 +40,9 @@ class StockBloc extends Bloc<StockEvent, StockState> {
         await Future.delayed(Duration(seconds: 1), () async* {
           yield (state as StockLoaded).clearMsg();
         });
-        // await Future.delayed(Duration(milliseconds: 500));
-
-        // yield StockLoaded((state as StockLoaded)
-        //     .data
-        //     .map((e) => e.copywith(open: true))
-        //     .toList());
       }
     }
     if (state is StockLoaded) {
-      // if (event is StockInitialize) {
-      //   if (event.success) {
-      //   } else {
-      //     yield StockInitial();
-      //     add(StockInitialize(success: false));
-      //   }
-      // }
       if (event is OnDataChanged) {
         yield StockLoaded((state as StockLoaded)
             .data
@@ -98,12 +85,6 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       }
       if (event is NewStockEntry) {
         List<ItemTr> prevData = (state as StockLoaded).data;
-        // DateTime Function() ditambahkan = () {
-        //   if (prevData.isNotEmpty) {
-        //     return prevData.last.ditambahkan;
-        //   }
-        //   return DateTime.now().toUtc();
-        // };
         DateTime? ditambahkan = prevData.isNotEmpty
             ? prevData.last.ditambahkan
             : DateTime.now().toUtc();
@@ -135,6 +116,10 @@ class StockBloc extends Bloc<StockEvent, StockState> {
               .where((element) => (element.id != event.item.id))
               .toList(),
         );
+        if ((state as StockLoaded).data.isEmpty) {
+          yield StockInitial();
+          add(StockInitialize(success: false));
+        }
       }
     }
   }

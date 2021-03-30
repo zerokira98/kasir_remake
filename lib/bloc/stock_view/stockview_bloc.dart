@@ -44,11 +44,13 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     }
     if (event is DeleteEntry) {
       try {
+        yield StockviewLoading();
         await _dbHelper.deleteStock(event.data.id.toString());
         add(Initializeview());
       } catch (e) {}
     }
     if (event is FilterChange) {
+      // var filter = (state as StockviewLoaded).filter.nama;
       yield StockviewLoading();
       List dbres = await (_dbHelper.showInsideStock(
           showName: true,
@@ -73,7 +75,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           // id: ,
         );
       }).toList();
-      yield StockviewLoaded(convert, Filter());
+      yield StockviewLoaded(convert, Filter(nama: event.name));
     }
   }
 }

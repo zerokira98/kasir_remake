@@ -19,6 +19,15 @@ class DatabaseProvider {
     return _db;
   }
 
+  Future closeDb() async {
+    String? dir = await getDatabasesPath();
+    String path = join(dir!, _dbName);
+    await deleteDatabase(path);
+    // _db = null;
+    isInitialized = false;
+    print('lewat cosedb');
+  }
+
   Future _init() async {
     String dir = await (getDatabasesPath() as FutureOr<String>);
     String path = join(dir, _dbName);
@@ -119,10 +128,7 @@ class DatabaseRepository {
   }
 
   closeDb() async {
-    // String dir = await getDatabasesPath();
-    // String path = join(dir, _dbName);
-    // await deleteDatabase(path);
-    // _db = null;
+    await databaseProvider.closeDb();
     // print('lewat cosedb');
   }
 
@@ -218,6 +224,10 @@ class DatabaseRepository {
       content = a[0].toString();
       try {
         await database.delete('add_stock', where: 'ID =?', whereArgs: [id]);
+        var items = await database
+            .query('items', where: 'ID = ?', whereArgs: [a[0]['ID_BRG']]);
+        await database.update('items',
+            {'JUMLAH': (items[0]['JUMLAH']! as int) - (a[0]['QTY'] as int)});
         await database.insert('change_history', {
           'type': 'delete',
           'table': 'add_stock',
@@ -238,7 +248,7 @@ class DatabaseRepository {
       print(result);
       return result;
     } else if ((query == null) && (barcode == null)) {
-      String sql = '''SELECT * FROM items LEFT JOIN add_stock 
+      String sql = '''SELECT *,items.ID AS ID FROM items LEFT JOIN add_stock 
           ON items.ID = add_stock.ID_BRG 
           GROUP BY items.NAMA 
           ORDER BY items.NAMA

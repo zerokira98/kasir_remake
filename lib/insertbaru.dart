@@ -137,7 +137,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                     // }
                                   },
                                   child: Text(
-                                    'Tambah Item',
+                                    'Tambah Item +',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
@@ -385,14 +385,15 @@ class _InsertProductCardState extends State<InsertProductCard>
                       );
                     },
                     onSuggestionSelected: (dynamic suggestion) async {
-                      var res = await RepositoryProvider.of<DatabaseRepository>(
-                              context)
-                          .showInsideStock(idbarang: suggestion['ID']);
+                      List res =
+                          await RepositoryProvider.of<DatabaseRepository>(
+                                  context)
+                              .showInsideStock(idbarang: suggestion['ID']);
                       // print(res);
                       BlocProvider.of<StockBloc>(context)
                           .add(OnDataChanged(widget.data.copywith(
                         name: suggestion['NAMA'],
-                        hargaBeli: res.last['PRICE'],
+                        hargaBeli: res.isNotEmpty ? res.last['PRICE'] : 0,
                         hargaJual: suggestion['HARGA_JUAL'],
                       )));
                       // hargaBeli.text = res.last['PRICE'].toString();
