@@ -103,7 +103,7 @@ class DebugPage extends StatelessWidget {
                         TextButton(
                             onPressed: () async {
                               var a = await getApplicationDocumentsDirectory();
-                              File theFile = File(a.path);
+                              File theFile = File(a.path + 'hewwo.csv');
                               var b = ListToCsvConverter().convert([
                                 ['Nama', 'Umur', 'Sex'],
                                 ['Rizal', '21', 'Male'],
@@ -118,7 +118,7 @@ class DebugPage extends StatelessWidget {
           ),
           ElevatedButton(
             child: Text('Test terminal'),
-            onPressed: () {
+            onPressed: () async {
               // Map a = {
               //   'abc': {
               //     'def': {'def1', 'def2', 'def3'},
@@ -132,7 +132,11 @@ class DebugPage extends StatelessWidget {
               //   print('key :' + key);
               //   print('value :' + value.toString());
               // });
-              RepositoryProvider.of<DatabaseRepository>(context).showPlaces();
+              var wao =
+                  (await RepositoryProvider.of<DatabaseRepository>(context)
+                      .showInsideStock(page: 0, showName: true));
+              print(wao);
+              print(wao['maxEntry']);
               // print(DateTime.now());
               // Navigator.push(
               //     context,

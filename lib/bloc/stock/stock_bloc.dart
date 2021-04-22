@@ -37,7 +37,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
               expdate: DateTime.now().add(Duration(days: 600)),
               open: false)
         ], success: event.success);
-        await Future.delayed(Duration(seconds: 1), () async* {
+        await Future.delayed(Duration(milliseconds: 400), () async* {
           yield (state as StockLoaded).clearMsg();
         });
       }

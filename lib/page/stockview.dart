@@ -14,21 +14,59 @@ class ListOfStockItems extends StatelessWidget {
         color: Colors.red,
         child: BlocBuilder<StockviewBloc, StockviewState>(
           builder: (context, state) {
+            ///---------- Pagination
             if (state is StockviewLoaded) {
               return Row(
                 children: [
                   Expanded(child: Container()),
-                  Icon(Icons.arrow_left),
+                  IconButton(
+                      onPressed: () {
+                        if ((state.filter.maxPage / 10).floor() !=
+                                state.currentPage - 1 &&
+                            state.currentPage != 0) {
+                          BlocProvider.of<StockviewBloc>(context).add(
+                              FilterChange(
+                                  name: state.filter.nama,
+                                  page: state.currentPage - 1));
+                        }
+                      },
+                      icon: Icon(Icons.arrow_left)),
                   Container(
                     width: 50,
                     color: Colors.blue,
                     child: Center(
-                        child: Text(
-                      state.currentPage.toString(),
-                      textScaleFactor: 1.6,
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          state.currentPage.toString(),
+                          textScaleFactor: 1.6,
+                        ),
+                        Text(
+                          '/',
+                          textScaleFactor: 1.6,
+                        ),
+                        Text(
+                          (state.filter.maxPage / 10).floor().toString(),
+                          textScaleFactor: 1.6,
+                        ),
+                      ],
                     )),
                   ),
-                  Icon(Icons.arrow_right),
+                  IconButton(
+                      onPressed: () {
+                        print(state.currentPage);
+                        print((state.filter.maxPage / 10).floor());
+                        if ((state.filter.maxPage / 10).floor() + 1 !=
+                            (state.currentPage + 1)) {
+                          print('a');
+                          BlocProvider.of<StockviewBloc>(context).add(
+                              FilterChange(
+                                  name: state.filter.nama,
+                                  page: state.currentPage + 1));
+                        }
+                      },
+                      icon: Icon(Icons.arrow_right)),
                   Expanded(child: Container()),
                 ],
               );
@@ -429,8 +467,9 @@ class FilterBox extends StatelessWidget {
                           // print(namaBarang.text + dateFromFull + dateToFull);
                           BlocProvider.of<StockviewBloc>(context)
                               .add(FilterChange(
-                            name: namaBarang.text, page: 0,
-                            // dateStart: dateFromFull,
+                            name: namaBarang.text,
+                            page: 0,
+                            dateStart: dateFrom.text,
                             dateEnd: dateTo.text,
                           ));
 

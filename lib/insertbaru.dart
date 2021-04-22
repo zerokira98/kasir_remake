@@ -13,6 +13,7 @@ class InsertProductPage extends StatefulWidget {
 }
 
 class _InsertProductPageState extends State<InsertProductPage> {
+  ScrollController scrollc = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,6 +97,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
             height: MediaQuery.of(context).size.height,
             // color: Colors.grey[100],
             child: SingleChildScrollView(
+              controller: scrollc,
               child: BlocBuilder<StockBloc, StockState>(
                 builder: (context, state) {
                   if (state is StockLoading) {
@@ -125,6 +127,13 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                         .add(NewStockEntry());
                                     print('tambah\'ed');
                                     FocusScope.of(context).unfocus();
+                                    Future.delayed(Duration(milliseconds: 950),
+                                        () {
+                                      scrollc.animateTo(
+                                          scrollc.position.maxScrollExtent,
+                                          duration: Duration(milliseconds: 400),
+                                          curve: Curves.ease);
+                                    });
                                     // bool valids = state.data.any((element) =>
                                     //     element.formkey.currentState
                                     //         .validate());
@@ -309,19 +318,6 @@ class _InsertProductCardState extends State<InsertProductCard>
                 return newvals;
               }),
         ),
-        // Expanded(
-        //     child: Padding(
-        //   padding: const EdgeInsets.all(4.0),
-        //   child: TextField(
-        //     controller: placec,
-        //     onChanged: (v) {
-        //       BlocProvider.of<StockBloc>(context).add(
-        //           OnDataChanged(widget.data.copywith(tempatBeli: placec.text)));
-        //     },
-        //     keyboardType: TextInputType.text,
-        //     decoration: InputDecoration(labelText: 'Tempat pembelian'),
-        //   ),
-        // )),
       ],
     );
     Widget theForm = Form(
@@ -385,9 +381,10 @@ class _InsertProductCardState extends State<InsertProductCard>
                       );
                     },
                     onSuggestionSelected: (dynamic suggestion) async {
-                      List res = await RepositoryProvider.of<
+                      Map res1 = await RepositoryProvider.of<
                               DatabaseRepository>(context)
                           .showInsideStock(idbarang: suggestion['ID'], page: 0);
+                      List res = res1['res'];
                       // print(res);
                       BlocProvider.of<StockBloc>(context)
                           .add(OnDataChanged(widget.data.copywith(
@@ -401,6 +398,9 @@ class _InsertProductCardState extends State<InsertProductCard>
                       // hargaJual.text = suggestion['HARGA_JUAL'].toString();
                     },
                   ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8),
                 ),
                 Row(
                   children: [

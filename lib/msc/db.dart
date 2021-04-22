@@ -269,7 +269,7 @@ class DatabaseRepository {
     return result;
   }
 
-  Future<List> showInsideStock(
+  Future<Map> showInsideStock(
       {int? idbarang,
       String? name,
       String? startDate,
@@ -279,38 +279,50 @@ class DatabaseRepository {
     name = name ?? '';
     startDate =
         startDate ?? DateTime.now().subtract(Duration(days: 5110)).toString();
-    print(endDate);
+    // print(endDate);
     endDate = endDate ?? DateTime.now().add(Duration(days: 50)).toString();
-    print(endDate);
+    // print(endDate);
     bool showname = showName ?? false;
-    List result = [];
+    List result = [], maxEntry = [];
     String sql;
     Database database = await databaseProvider.db();
     try {
       if (idbarang != null) {
-        sql = '''SELECT * FROM add_stock WHERE ID_BRG=?''';
-        result = await database.rawQuery(sql, [idbarang]);
+        sql = '''SELECT * FROM add_stock WHERE ID_BRG=? ''';
+        String limit = '''LIMIT ? OFFSET ?''';
+        result =
+            await database.rawQuery(sql + limit, [idbarang, 10, (page * 10)]);
+        //---
+        String maxSql =
+            '''SELECT COUNT(ID) AS COUNT FROM add_stock WHERE ID_BRG=?''';
+        maxEntry = await database.rawQuery(maxSql, [idbarang]);
       } else if (showname == true) {
-        String filterString =
-            '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ? LIMIT 10 OFFSET ?''';
-        sql = '''SELECT *,items.NAMA AS NAMA,tempat_beli.NAMA AS SUPPLIER,add_stock.ID AS STOCK_ID,
+        sql =
+            '''SELECT *,items.NAMA AS NAMA,tempat_beli.NAMA AS SUPPLIER,add_stock.ID AS STOCK_ID,
         tempat_beli.ID AS TEMPAT_ID 
         FROM add_stock 
+        ''';
+        String maxSql = '''SELECT COUNT(*) AS COUNT FROM add_stock ''';
+        String join = '''
         LEFT JOIN items ON items.ID = add_stock.ID_BRG ''' +
-            ''' LEFT JOIN tempat_beli ON tempat_beli.ID=add_stock.SUPPLIER ''' +
-            filterString;
-        result = await database
-            .rawQuery(sql, ['%$name%', startDate, endDate, (page * 10)]);
+            ''' LEFT JOIN tempat_beli ON tempat_beli.ID=add_stock.SUPPLIER ''';
+        String filterString =
+            '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ? ORDER BY ADD_DATE ASC ''';
+        String limit = '''LIMIT ? OFFSET ?''';
+        result = await database.rawQuery(sql + join + filterString + limit,
+            ['%$name%', startDate, endDate, 10, (page * 10)]);
+        maxEntry = await database.rawQuery(
+            maxSql + join + filterString, ['%$name%', startDate, endDate]);
       } else {
         sql = '''SELECT * FROM add_stock''';
         result = await database.rawQuery(sql);
       }
 
-      print(result);
+      // print(result);
     } on DatabaseException catch (e) {
       print(e);
     }
-    return result;
+    return {'res': result, 'maxEntry': maxEntry[0]['COUNT']};
   }
 
   Future<List> showPlaces({String? query}) async {
