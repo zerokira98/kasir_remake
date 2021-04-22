@@ -7,7 +7,7 @@ import 'package:kasir_remake/bloc/stock_view/stockview_bloc.dart';
 import 'package:kasir_remake/listviewof_item.dart';
 import 'package:kasir_remake/msc/db.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:kasir_remake/page/stockview.dart';
+import 'package:kasir_remake/page/stockview/stockview.dart';
 
 class DebugPage extends StatelessWidget {
   @override
