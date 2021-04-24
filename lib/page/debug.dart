@@ -102,13 +102,31 @@ class DebugPage extends StatelessWidget {
                       actions: [
                         TextButton(
                             onPressed: () async {
-                              var a = await getApplicationDocumentsDirectory();
-                              File theFile = File(a.path + 'hewwo.csv');
-                              var b = ListToCsvConverter().convert([
-                                ['Nama', 'Umur', 'Sex'],
-                                ['Rizal', '21', 'Male'],
-                              ]);
+                              var a = await getExternalStorageDirectory();
+                              var data = await RepositoryProvider.of<
+                                      DatabaseRepository>(context)
+                                  .showInsideStock(page: -1, showName: true);
+                              print(data);
+                              File theFile = File(a!.path + 'backup.csv');
+                              var datalist = (data['res'] as List)
+                                  .map<List>((e) => [
+                                        e['ADD_DATE']
+                                            .toString()
+                                            .substring(0, 10),
+                                        e['NAMA'],
+                                        e['PRICE'],
+                                        e['QTY'],
+                                        e['SUPPLIER']
+                                      ])
+                                  .toList();
+                              var b = ListToCsvConverter().convert(datalist
+                                  //   [
+                                  //   ['Nama', 'Umur', 'Sex'],
+                                  //   ['Rizal', '21', 'Male'],
+                                  // ]
+                                  );
                               theFile.writeAsStringSync(b);
+                              print('end');
                             },
                             child: Text('Print March'))
                       ],

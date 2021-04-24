@@ -30,6 +30,7 @@ class DatabaseProvider {
 
   Future _init() async {
     String dir = await (getDatabasesPath());
+    print(dir);
     String path = join(dir, _dbName);
     try {
       _db = await openDatabase(path, version: _dbVersion,
@@ -302,17 +303,26 @@ class DatabaseRepository {
         tempat_beli.ID AS TEMPAT_ID 
         FROM add_stock 
         ''';
-        String maxSql = '''SELECT COUNT(*) AS COUNT FROM add_stock ''';
         String join = '''
         LEFT JOIN items ON items.ID = add_stock.ID_BRG ''' +
             ''' LEFT JOIN tempat_beli ON tempat_beli.ID=add_stock.SUPPLIER ''';
         String filterString =
             '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ? ORDER BY ADD_DATE ASC ''';
-        String limit = '''LIMIT ? OFFSET ?''';
-        result = await database.rawQuery(sql + join + filterString + limit,
-            ['%$name%', startDate, endDate, 10, (page * 10)]);
-        maxEntry = await database.rawQuery(
-            maxSql + join + filterString, ['%$name%', startDate, endDate]);
+        if (page == -1) {
+          result = await database.rawQuery(
+            sql + join,
+          );
+          maxEntry = [
+            {'COUNT': -1}
+          ];
+        } else {
+          String maxSql = '''SELECT COUNT(*) AS COUNT FROM add_stock ''';
+          String limit = '''LIMIT ? OFFSET ?''';
+          result = await database.rawQuery(sql + join + filterString + limit,
+              ['%$name%', startDate, endDate, 10, (page * 10)]);
+          maxEntry = await database.rawQuery(
+              maxSql + join + filterString, ['%$name%', startDate, endDate]);
+        }
       } else {
         sql = '''SELECT * FROM add_stock''';
         result = await database.rawQuery(sql);

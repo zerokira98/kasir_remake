@@ -1,11 +1,13 @@
 part of 'stockview.dart';
 
 class FilterBox extends StatelessWidget {
-  final dateFrom = TextEditingController();
-  final dateTo = TextEditingController();
-
-  ///*Edit this var plz-----------------
-  // final dateFromFull, dateToFull;
+  final dateFrom = TextEditingController(
+      text: DateTime.now()
+          .subtract(Duration(days: 1365))
+          .toString()
+          .substring(0, 10));
+  final dateTo = TextEditingController(
+      text: DateTime.now().add(Duration(days: 1)).toString().substring(0, 10));
   final namaBarang = TextEditingController();
   final int dropdownValue = 0;
   @override
@@ -15,23 +17,9 @@ class FilterBox extends StatelessWidget {
         if (state is StockviewLoaded) {
           namaBarang.text = state.filter.nama ?? '';
           return Container(
-            // color: Colors.blue,
-            // margin: EdgeInsets.all(18.0),
             padding: EdgeInsets.all(12.0),
             decoration: BoxDecoration(
                 color: Colors.white,
-                // boxShadow: [
-                //   BoxShadow(
-                //     blurRadius: 8.0,
-                //     color: Colors.grey,
-                //     offset: Offset(8.0, 8.0),
-                //   ),
-                //   // BoxShadow(
-                //   //   blurRadius: 8.0,
-                //   //   color: Colors.white,
-                //   //   offset: Offset(-8.0, -8.0),
-                //   // )
-                // ],
                 border: Border.all(color: Colors.grey[50]!),
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(24.0))),
