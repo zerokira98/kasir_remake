@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
@@ -37,7 +35,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                     List<Widget> data = state.data
                         .map<Widget>((e) => TransactionItemCard(
                               item: e,
-                              key: Key(e.id.toString()),
+                              key: Key(e.cardId.toString()),
                             ))
                         .toList();
                     return Column(

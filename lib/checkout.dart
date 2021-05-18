@@ -68,7 +68,7 @@ class CheckOutTr extends StatelessWidget {
                                 child: Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text('${e.name}'),
+                              child: Text('${e.namaBarang}'),
                             )),
                             TableCell(
                                 child: Text(

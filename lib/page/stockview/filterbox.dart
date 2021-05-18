@@ -2,13 +2,16 @@ part of 'stockview.dart';
 
 class FilterBox extends StatelessWidget {
   final dateFrom = TextEditingController(
-      text: DateTime.now()
-          .subtract(Duration(days: 1365))
-          .toString()
-          .substring(0, 10));
+      // text: DateTime.now()
+      //     .subtract(Duration(days: 1365))
+      //     .toString()
+      //     .substring(0, 10),
+      );
   final dateTo = TextEditingController(
-      text: DateTime.now().add(Duration(days: 1)).toString().substring(0, 10));
+      // text: DateTime.now().add(Duration(days: 1)).toString().substring(0, 10),
+      );
   final namaBarang = TextEditingController();
+  final tempatBeliController = TextEditingController();
   final int dropdownValue = 0;
   @override
   Widget build(BuildContext context) {
@@ -16,6 +19,9 @@ class FilterBox extends StatelessWidget {
       builder: (context, state) {
         if (state is StockviewLoaded) {
           namaBarang.text = state.filter.nama ?? '';
+          tempatBeliController.text = state.filter.tempatBeli ?? '';
+          dateFrom.text = state.filter.startDate.substring(0, 10);
+          dateTo.text = state.filter.endDate.substring(0, 10);
           return Container(
             padding: EdgeInsets.all(12.0),
             decoration: BoxDecoration(
@@ -28,6 +34,20 @@ class FilterBox extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'Filter',
+                          textScaleFactor: 1.75,
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
                       flex: 3,
                       child: TextField(
                         controller: namaBarang,
@@ -36,10 +56,11 @@ class FilterBox extends StatelessWidget {
                         ),
                       ),
                     ),
+                    Padding(padding: EdgeInsets.all(4.0)),
                     Expanded(
                       flex: 2,
                       child: TextField(
-                        controller: TextEditingController(),
+                        controller: tempatBeliController,
                         decoration: InputDecoration(
                           labelText: 'Tempat beli',
                         ),
@@ -63,9 +84,10 @@ class FilterBox extends StatelessWidget {
                                   DateTime.now().subtract(Duration(days: 365)),
                               lastDate:
                                   DateTime.now().add(Duration(days: 365)));
-
-                          dateFrom.text =
-                              selectedDate.toString().substring(0, 10);
+                          if (selectedDate != null) {
+                            dateFrom.text =
+                                selectedDate.toString().substring(0, 10);
+                          }
                           // dateFromFull = selectedDate.toString();
                         },
                         child: TextField(
@@ -86,8 +108,10 @@ class FilterBox extends StatelessWidget {
                                   DateTime.now().subtract(Duration(days: 365)),
                               lastDate:
                                   DateTime.now().add(Duration(days: 365)));
-                          dateTo.text =
-                              selectedDate.toString().substring(0, 10);
+                          if (selectedDate != null) {
+                            dateTo.text =
+                                selectedDate.toString().substring(0, 10);
+                          }
                           // dateToFull = selectedDate.toString();
                         },
                         child: TextField(
@@ -142,6 +166,7 @@ class FilterBox extends StatelessWidget {
                               .add(FilterChange(
                             name: namaBarang.text,
                             page: 0,
+                            tempatBeli: tempatBeliController.text,
                             dateStart: dateFrom.text,
                             dateEnd: dateTo.text,
                           ));

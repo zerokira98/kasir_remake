@@ -39,10 +39,10 @@ class _TransactionItemCardState extends State<TransactionItemCard>
     return BlocBuilder<TransactionBloc, TransactionState>(
       builder: (context, state) {
         if (state is TransactionLoaded) {
-          print(widget.item.name);
+          print(widget.item.namaBarang);
           // namaC.text = widget.item.name ?? '';
-          if (namaC.text != widget.item.name?.toString())
-            namaC.text = widget.item.name?.toString() ?? '';
+          if (namaC.text != widget.item.namaBarang?.toString())
+            namaC.text = widget.item.namaBarang?.toString() ?? '';
           hargaSatuan.text = widget.item.hargaJual?.toString() ?? '';
           barcodeC.text = widget.item.barcode?.toString() ?? '';
           if (qtyC.text != widget.item.pcs?.toString())

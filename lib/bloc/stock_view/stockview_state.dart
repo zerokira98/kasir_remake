@@ -21,9 +21,17 @@ class StockviewLoaded extends StockviewState {
 }
 
 class Filter extends Equatable {
-  final int maxPage;
   final String? nama;
-  Filter({this.nama, required this.maxPage});
+  final String? tempatBeli;
+  final int maxPage;
+  final String startDate;
+  final String endDate;
+  Filter(
+      {this.nama,
+      this.tempatBeli,
+      required this.maxPage,
+      required this.startDate,
+      required this.endDate});
 
   @override
   List<Object?> get props => [nama];

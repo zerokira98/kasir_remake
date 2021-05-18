@@ -5,14 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir_remake/bloc/stock/stock_bloc.dart';
 import 'package:kasir_remake/bloc/stock_view/stockview_bloc.dart';
 import 'package:kasir_remake/bloc/transaction/transaction_bloc.dart';
-import 'package:kasir_remake/insertbaru.dart';
+import 'package:kasir_remake/page/insert_stock/insert_stock.dart';
 import 'package:kasir_remake/msc/bloc_observer.dart';
 import 'package:kasir_remake/msc/db.dart';
 import 'package:kasir_remake/page/debug.dart';
-import 'package:kasir_remake/page/stats.dart';
-import 'package:kasir_remake/transaksipage.dart';
 import 'package:bloc/bloc.dart';
-import 'package:kasir_remake/pulsa.dart';
+// import 'package:kasir_remake/page/stats.dart';
+// import 'package:kasir_remake/transaksipage.dart';
+// import 'package:kasir_remake/pulsa.dart';
 
 void main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
             pageTransitionsTheme: PageTransitionsTheme(builders: {
               TargetPlatform.android: CupertinoPageTransitionsBuilder()
             }),
-            primarySwatch: Colors.red,
+            primarySwatch: Colors.green,
           ),
           home: HomePage(),
         ),
@@ -90,12 +90,12 @@ class _HomePageState extends State<HomePage> {
             },
             currentIndex: navIndex,
             items: [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.shop), label: 'Transaksi'),
+              // BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.shop), label: 'Transaksi'),
               BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
               // BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
-              BottomNavigationBarItem(icon: Icon(Icons.phone), label: 'Pulsa'),
+              // BottomNavigationBarItem(icon: Icon(Icons.phone), label: 'Pulsa'),
               BottomNavigationBarItem(icon: Icon(Icons.list), label: 'More'),
             ]),
         body: Column(
@@ -106,11 +106,11 @@ class _HomePageState extends State<HomePage> {
                   itemCount: 5,
                   controller: pageC,
                   itemBuilder: (context, i) {
-                    if (i == 0) return Stats();
-                    if (i == 1) return TransaksiPage();
-                    if (i == 2) return InsertProductPage();
-                    if (i == 3) return TransaksiPulsa();
-                    if (i == 4) return DebugPage();
+                    // if (i == 0) return Stats();
+                    // if (i == 1) return TransaksiPage();
+                    if (i == 0) return InsertProductPage();
+                    // if (i == 3) return TransaksiPulsa();
+                    if (i == 1) return DebugPage();
                     return CircularProgressIndicator();
                   }),
             ),

@@ -18,61 +18,56 @@ class _InsertProductPageState extends State<InsertProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          elevation: 7,
           title: Text('Masuk Barang'),
           actions: [
-            InkWell(
-              onTap: () {
-                var state =
-                    (BlocProvider.of<StockBloc>(context).state as StockLoaded);
+            Container(
+              padding: EdgeInsets.all(8.0),
+              child: GestureDetector(
+                // highlightColor: Colors.green,
+                onTap: () {
+                  var state = (BlocProvider.of<StockBloc>(context).state
+                      as StockLoaded);
 
-                // bool valids = state.data.isNotEmpty
-                //     ? state.data.every(
-                //         (element) => element.formkey!.currentState!.validate())
-                //     : false;
-                // if (valids) {
-                //   print('valids');
-                BlocProvider.of<StockBloc>(context).add(UploadtoDB(state.data));
-                // } else {
-                //   print('not valid');
-                //   // if (state.data.isEmpty)
-                //   //   BlocProvider.of<StockBloc>(context)
-                //   //       .add(StockInitialize(success: false));
-                // }
-              },
-              child: Container(
-                  // width: 56,
-                  // height: 56,
+                  BlocProvider.of<StockBloc>(context)
+                      .add(UploadtoDB(state.data));
+                },
+                child: Container(
+                    // width: 56,
+                    // height: 56,
 
-                  margin: EdgeInsets.all(4.0),
-                  padding: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.green[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      BlocBuilder<StockBloc, StockState>(
-                        builder: (context, state) {
-                          if (state is StockLoading) {
-                            return CircularProgressIndicator();
-                          }
-                          return Container();
-                        },
-                      ),
-                      Text(
-                        'Submit',
-                        textScaleFactor: 1.2,
-                        style: TextStyle(color: Colors.black),
-                        textAlign: TextAlign.center,
-                      ),
-                      Icon(
-                        Icons.subdirectory_arrow_right,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ],
-                  )),
+                    padding: EdgeInsets.only(left: 4.0, right: 12.0),
+                    decoration: BoxDecoration(
+                      color: Colors.green[100],
+                      boxShadow: [BoxShadow(blurRadius: 2.0)],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        BlocBuilder<StockBloc, StockState>(
+                          builder: (context, state) {
+                            if (state is StockLoading) {
+                              return CircularProgressIndicator();
+                            }
+                            return Container();
+                          },
+                        ),
+                        Icon(
+                          Icons.subdirectory_arrow_right,
+                          color: Colors.grey,
+                          size: 28,
+                        ),
+                        Text(
+                          'Submit',
+                          textScaleFactor: 1.25,
+                          style: TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.w500),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    )),
+              ),
             ),
           ],
         ),
@@ -109,8 +104,8 @@ class _InsertProductPageState extends State<InsertProductPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         for (int i = 0; i < state.data.length; i++)
-                          InsertProductCard(
-                              state.data[i], Key(state.data[i].id.toString())),
+                          InsertProductCard(state.data[i],
+                              Key(state.data[i].cardId.toString())),
                         Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
@@ -203,8 +198,8 @@ class _InsertProductCardState extends State<InsertProductCard>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.name != namec!.text) {
-      namec!.text = widget.data.name ?? '';
+    if (widget.data.namaBarang != namec!.text) {
+      namec!.text = widget.data.namaBarang ?? '';
     }
     if (widget.data.tempatBeli != placec!.text) {
       placec!.text = widget.data.tempatBeli ?? '';
@@ -392,10 +387,6 @@ class _InsertProductCardState extends State<InsertProductCard>
                         hargaBeli: res.isNotEmpty ? res.last['PRICE'] : 0,
                         hargaJual: suggestion['HARGA_JUAL'],
                       )));
-                      // hargaBeli.text = res.last['PRICE'].toString();
-                      // namec.text = suggestion['NAMA'];
-                      // // hargaBeli.text = suggestion['']
-                      // hargaJual.text = suggestion['HARGA_JUAL'].toString();
                     },
                   ),
                 ),
@@ -428,8 +419,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                             },
                             controller: hargaBeli,
                             keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                                labelText: 'Harga beli per pcs'),
+                            decoration:
+                                InputDecoration(labelText: 'Harga beli '),
                           ),
                         )),
                     Expanded(
@@ -455,8 +446,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                   hargaJual: int.parse(hargaJual!.text))));
                         },
                         keyboardType: TextInputType.number,
-                        decoration:
-                            InputDecoration(labelText: 'Harga jual per pcs'),
+                        decoration: InputDecoration(labelText: 'Harga jual '),
                       ),
                     )),
                     Expanded(

@@ -2,21 +2,21 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 class ItemTr extends Equatable {
-  final String? name;
+  final String? namaBarang;
   final int? hargaBeli;
   final int? hargaJual;
   final int? pcs;
   final GlobalKey<FormState>? formkey;
   final int? productId;
+  final int? cardId; //~??????
   final String? tempatBeli;
   final String? barcode;
-  final int? id;
   final bool? open;
   final DateTime? expdate;
   final DateTime? ditambahkan;
 
   ItemTr(
-      {this.name,
+      {this.namaBarang,
       this.hargaBeli,
       this.productId,
       this.hargaJual,
@@ -27,7 +27,7 @@ class ItemTr extends Equatable {
       this.open,
       this.expdate,
       this.ditambahkan,
-      this.id});
+      this.cardId});
   ItemTr copywith(
       {String? name,
       int? hargaBeli,
@@ -44,7 +44,7 @@ class ItemTr extends Equatable {
     return ItemTr(
         barcode: barcode ?? this.barcode,
         open: open ?? this.open,
-        name: name ?? this.name,
+        namaBarang: name ?? this.namaBarang,
         formkey: formkey ?? this.formkey,
         productId: productId ?? this.productId,
         expdate: expdate ?? this.expdate,
@@ -53,17 +53,17 @@ class ItemTr extends Equatable {
         hargaJual: hargaJual ?? this.hargaJual,
         pcs: pcs ?? this.pcs,
         tempatBeli: tempatBeli ?? this.tempatBeli,
-        id: id ?? this.id);
+        cardId: id ?? this.cardId);
   }
 
   @override
   List<Object?> get props => [
-        name,
+        namaBarang,
         hargaBeli,
         hargaJual,
         pcs,
         tempatBeli,
-        id,
+        cardId,
         open,
         expdate,
         barcode,
@@ -83,7 +83,7 @@ class ItemTr extends Equatable {
     return ItemTr(
       barcode: data['BARCODE']?.toString(),
       // open: data[''],
-      name: data['NAMA'],
+      namaBarang: data['NAMA'],
       // formkey: formkey ?? this.formkey,
       productId: data['ID'],
       expdate: DateTime.parse(data['EXP_DATE']),

@@ -20,7 +20,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
     add(StockInitialize(success: false));
   }
   bool verify(List<ItemTr> data) {
-    return data.any((e) => e.name != null);
+    return data.any((e) => e.namaBarang != null);
   }
 
   @override
@@ -31,7 +31,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       if (event is StockInitialize) {
         yield StockLoaded([
           ItemTr(
-              id: Random().nextInt(510),
+              cardId: Random().nextInt(510),
               // formkey: GlobalKey<FormState>(),
               ditambahkan: DateTime.now().toUtc(),
               expdate: DateTime.now().add(Duration(days: 600)),
@@ -46,7 +46,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       if (event is OnDataChanged) {
         yield StockLoaded((state as StockLoaded)
             .data
-            .map((e) => (e.id == event.item.id) ? event.item : e)
+            .map((e) => (e.cardId == event.item.cardId) ? event.item : e)
             .toList());
       }
       if (event is UploadtoDB) {
@@ -91,7 +91,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
         yield StockLoaded((state as StockLoaded).data +
             [
               ItemTr(
-                  id: Random().nextInt(510),
+                  cardId: Random().nextInt(510),
                   ditambahkan: ditambahkan,
                   expdate: DateTime.now().add(Duration(days: 690)),
                   open: false)
@@ -106,14 +106,15 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       if (event is DeleteEntry) {
         yield StockLoaded((state as StockLoaded)
             .data
-            .map((e) => e.id == event.item.id ? e.copywith(open: false) : e)
+            .map((e) =>
+                e.cardId == event.item.cardId ? e.copywith(open: false) : e)
             .toList());
 
         await Future.delayed(Duration(milliseconds: 550));
         yield StockLoaded(
           (state as StockLoaded)
               .data
-              .where((element) => (element.id != event.item.id))
+              .where((element) => (element.cardId != event.item.cardId))
               .toList(),
         );
         if ((state as StockLoaded).data.isEmpty) {

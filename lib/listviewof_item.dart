@@ -87,8 +87,8 @@ class _EditItemPageState extends State<EditItemPage>
 
   @override
   Widget build(BuildContext context) {
-    if (data.name != namec.text) {
-      namec.text = data.name ?? '';
+    if (data.namaBarang != namec.text) {
+      namec.text = data.namaBarang ?? '';
     }
     if (data.hargaJual?.toString() != hargaJual.text) {
       hargaJual.text = data.hargaJual?.toString() ?? '';

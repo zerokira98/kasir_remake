@@ -124,7 +124,7 @@ class _StockviewCardState extends State<StockviewCard> {
               isThreeLine: true,
               // shape: RoundedRectangleBorder( ),
               // tileColor: Colors.white,
-              title: Text(widget.data.name.toString()),
+              title: Text(widget.data.namaBarang.toString()),
               subtitle: Row(
                 children: [
                   Text('Tempat beli: ${widget.data.tempatBeli}' +

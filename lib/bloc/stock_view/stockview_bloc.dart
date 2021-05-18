@@ -23,12 +23,13 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     if (event is Initializeview) {
       Map<dynamic, dynamic> dbres =
           await (_dbHelper.showInsideStock(showName: true, page: 0));
+      print(dbres);
       List<ItemTr> convert = dbres['res'].map<ItemTr>((e) {
         var dateDb = e['ADD_DATE'].toString();
         bool isUtc = dateDb.contains('Z');
 
         return ItemTr(
-          name: e['NAMA'],
+          namaBarang: e['NAMA'],
           // barcode: null,
           ditambahkan: isUtc
               ? DateTime.parse(dateDb).toLocal()
@@ -38,16 +39,23 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           hargaBeli: e['PRICE'],
           hargaJual: e['HARGA_JUAL'],
           tempatBeli: e['SUPPLIER'],
-          id: e['STOCK_ID'],
+          cardId: e['STOCK_ID'],
         );
       }).toList();
-      yield StockviewLoaded(convert, Filter(maxPage: dbres['maxEntry']),
+      yield StockviewLoaded(
+          convert,
+          Filter(
+            maxPage: dbres['maxEntry'],
+            startDate:
+                DateTime.now().subtract(Duration(days: 30 * 12)).toString(),
+            endDate: DateTime.now().add(Duration(days: 1)).toString(),
+          ),
           currentPage: 0);
     }
     if (event is DeleteEntry) {
       try {
         yield StockviewLoading();
-        await _dbHelper.deleteStock(event.data.id.toString());
+        await _dbHelper.deleteStock(event.data.cardId.toString());
         add(Initializeview());
       } catch (e) {}
     }
@@ -57,6 +65,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
       Map dbres = await (_dbHelper.showInsideStock(
           showName: true,
           name: event.name,
+          tempatBeli: event.tempatBeli,
           startDate: event.dateStart,
           endDate: event.dateEnd,
           page: event.page));
@@ -67,7 +76,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
             ? DateTime.parse(dateDb).toLocal()
             : DateTime.parse(dateDb + 'Z').toLocal();
         return ItemTr(
-          name: e['NAMA'],
+          namaBarang: e['NAMA'],
           // barcode: null,
           ditambahkan: ditambahkan,
           pcs: e['QTY'],
@@ -79,7 +88,14 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
         );
       }).toList();
       yield StockviewLoaded(
-          convert, Filter(nama: event.name, maxPage: dbres['maxEntry']),
+          convert,
+          Filter(
+            nama: event.name,
+            maxPage: dbres['maxEntry'],
+            tempatBeli: event.tempatBeli,
+            startDate: event.dateStart,
+            endDate: event.dateEnd,
+          ),
           currentPage: event.page);
     }
   }

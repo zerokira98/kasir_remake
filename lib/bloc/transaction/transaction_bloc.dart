@@ -28,7 +28,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     if (event is LoadInitial) {
       print('initial');
       yield TransactionLoaded(
-          data: [ItemTr(id: Random().nextInt(210), open: true)]);
+          data: [ItemTr(cardId: Random().nextInt(210), open: true)]);
     }
     if (event is UploadToDB) {
       List<ItemTr> data = (state as TransactionLoaded).data;
@@ -44,21 +44,21 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     }
     if (event is UpdateItem) {
       var data = (state as TransactionLoaded).data.map((e) {
-        return e.id != event.item.id ? e : event.item;
+        return e.cardId != event.item.cardId ? e : event.item;
       }).toList();
       yield TransactionLoading();
       yield TransactionLoaded(data: data);
     }
     if (event is AddItem) {
       if (state is TransactionLoaded) {
-        var newItem = ItemTr(id: Random().nextInt(210), open: false);
+        var newItem = ItemTr(cardId: Random().nextInt(210), open: false);
         yield TransactionLoaded(
           data: (state as TransactionLoaded).data + [newItem],
         );
         await Future.delayed(Duration(milliseconds: 50), () {});
         yield TransactionLoaded(
             data: (state as TransactionLoaded).data.map((e) {
-          return e.id != newItem.id ? e : newItem.copywith(open: true);
+          return e.cardId != newItem.cardId ? e : newItem.copywith(open: true);
         }).toList());
       }
     }
@@ -66,7 +66,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       print('delete item');
       yield TransactionLoaded(
           data: (state as TransactionLoaded).data.map((e) {
-        return e.id != event.item!.id ? e : event.item!.copywith(open: false);
+        return e.cardId != event.item!.cardId
+            ? e
+            : event.item!.copywith(open: false);
       }).toList());
 
       await Future.delayed(Duration(milliseconds: 500), () {});

@@ -15,7 +15,7 @@ class ListOfStockItems extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Container(
-        color: Colors.red,
+        color: Theme.of(context).primaryColor,
         child: BlocBuilder<StockviewBloc, StockviewState>(
           builder: (context, state) {
             ///---------- Pagination
@@ -31,18 +31,29 @@ class ListOfStockItems extends StatelessWidget {
                           BlocProvider.of<StockviewBloc>(context).add(
                               FilterChange(
                                   name: state.filter.nama,
+                                  dateStart: state.filter.startDate,
+                                  dateEnd: state.filter.endDate,
                                   page: state.currentPage - 1));
                         }
                       },
                       child: Container(
-                          margin: EdgeInsets.all(4),
+                          margin: EdgeInsets.symmetric(horizontal: 6),
+                          padding: EdgeInsets.all(2),
                           decoration: BoxDecoration(
                             color: Colors.lightGreen[100],
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Icon(Icons.arrow_left))),
+                          child: Icon(
+                            Icons.arrow_left,
+                            color: ((state.filter.maxPage / 10).floor() !=
+                                        state.currentPage - 1 &&
+                                    state.currentPage != 0)
+                                ? Colors.black
+                                : Colors.grey,
+                          ))),
                   Container(
                     width: 50,
+                    padding: EdgeInsets.symmetric(horizontal: 4),
                     color: Colors.grey[350],
                     child: Center(
                         child: Row(
@@ -50,15 +61,15 @@ class ListOfStockItems extends StatelessWidget {
                       children: [
                         Text(
                           (state.currentPage + 1).toString(),
-                          textScaleFactor: 1.6,
+                          textScaleFactor: 1.4,
                         ),
                         Text(
                           '/',
-                          textScaleFactor: 1.6,
+                          textScaleFactor: 1.4,
                         ),
                         Text(
                           ((state.filter.maxPage / 10).floor() + 1).toString(),
-                          textScaleFactor: 1.6,
+                          textScaleFactor: 1.4,
                         ),
                       ],
                     )),
@@ -69,20 +80,28 @@ class ListOfStockItems extends StatelessWidget {
                         print((state.filter.maxPage / 10).floor());
                         if ((state.filter.maxPage / 10).floor() + 1 !=
                             (state.currentPage + 1)) {
-                          print('a');
                           BlocProvider.of<StockviewBloc>(context).add(
                               FilterChange(
                                   name: state.filter.nama,
+                                  dateStart: state.filter.startDate,
+                                  dateEnd: state.filter.endDate,
                                   page: state.currentPage + 1));
                         }
                       },
                       child: Container(
-                          margin: EdgeInsets.all(4),
+                          margin: EdgeInsets.symmetric(horizontal: 6),
+                          padding: EdgeInsets.all(2),
                           decoration: BoxDecoration(
                             color: Colors.lightGreen[100],
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Icon(Icons.arrow_right))),
+                          child: Icon(
+                            Icons.arrow_right,
+                            color: ((state.filter.maxPage / 10).floor() + 1 !=
+                                    (state.currentPage + 1))
+                                ? Colors.black
+                                : Colors.grey,
+                          ))),
                   Expanded(child: Container()),
                 ],
               );
@@ -172,7 +191,7 @@ class ListOfStockItems extends StatelessWidget {
                               ]),
 
                             ///------
-                            StockviewCard(data, Key(data.id.toString())),
+                            StockviewCard(data, Key(data.cardId.toString())),
                           ],
                         );
                       },

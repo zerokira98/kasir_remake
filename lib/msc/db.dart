@@ -151,18 +151,18 @@ class DatabaseRepository {
         print('iterations');
         int result;
         List<dynamic> checkItem = await database
-            .query('items', where: 'NAMA=?', whereArgs: [item.name]);
+            .query('items', where: 'NAMA=?', whereArgs: [item.namaBarang]);
 
         /// if not found, add new into items. else just insert add_stock
         if (checkItem.isEmpty) {
           String sql =
               '''INSERT INTO items(NAMA,HARGA_JUAL,JUMLAH,EXP_DATE,BARCODE) VALUES (?,?,?,?,?)''';
           result = await database.rawInsert(sql, [
-            item.name,
+            item.namaBarang?.trim(),
             item.hargaJual,
             item.pcs,
             item.expdate.toString(),
-            item.barcode
+            item.barcode?.trim(),
           ]);
         } else {
           int jumlah = (checkItem[0]['JUMLAH'] as int) + item.pcs!;
@@ -270,23 +270,26 @@ class DatabaseRepository {
     return result;
   }
 
-  Future<Map> showInsideStock(
-      {int? idbarang,
-      String? name,
-      String? startDate,
-      bool? showName,
-      String? endDate,
-      required int page}) async {
+  Future<Map> showInsideStock({
+    String? name,
+    int? idbarang,
+    bool? showName,
+    String? startDate,
+    String? endDate,
+    String? tempatBeli,
+    required int page,
+  }) async {
+    //construct var-------------------
     name = name ?? '';
+    tempatBeli = tempatBeli ?? '';
     startDate =
         startDate ?? DateTime.now().subtract(Duration(days: 5110)).toString();
-    // print(endDate);
     endDate = endDate ?? DateTime.now().add(Duration(days: 50)).toString();
-    // print(endDate);
     bool showname = showName ?? false;
     List result = [], maxEntry = [];
     String sql;
     Database database = await databaseProvider.db();
+    //--------------------
     try {
       if (idbarang != null) {
         sql = '''SELECT * FROM add_stock WHERE ID_BRG=? ''';
@@ -307,23 +310,31 @@ class DatabaseRepository {
         LEFT JOIN items ON items.ID = add_stock.ID_BRG ''' +
             ''' LEFT JOIN tempat_beli ON tempat_beli.ID=add_stock.SUPPLIER ''';
         String filterString =
-            '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ? ORDER BY ADD_DATE ASC ''';
+            '''WHERE items.NAMA LIKE ? AND ADD_DATE >= ? AND ADD_DATE <= ? AND tempat_beli.NAMA LIKE ? ORDER BY ADD_DATE ASC ''';
         if (page == -1) {
-          result = await database.rawQuery(
-            sql + join,
-          );
+          //Show All inside with product name
+          result = await database.rawQuery(sql + join + filterString,
+              ['%$name%', startDate, endDate, '%$tempatBeli%']);
           maxEntry = [
             {'COUNT': -1}
           ];
         } else {
+          //Entries with pagination
           String maxSql = '''SELECT COUNT(*) AS COUNT FROM add_stock ''';
           String limit = '''LIMIT ? OFFSET ?''';
-          result = await database.rawQuery(sql + join + filterString + limit,
-              ['%$name%', startDate, endDate, 10, (page * 10)]);
-          maxEntry = await database.rawQuery(
-              maxSql + join + filterString, ['%$name%', startDate, endDate]);
+          result = await database.rawQuery(sql + join + filterString + limit, [
+            '%$name%',
+            startDate,
+            endDate,
+            '%$tempatBeli%',
+            10,
+            (page * 10)
+          ]);
+          maxEntry = await database.rawQuery(maxSql + join + filterString,
+              ['%$name%', startDate, endDate, '%$tempatBeli%']);
         }
       } else {
+        //show without product name
         sql = '''SELECT * FROM add_stock''';
         result = await database.rawQuery(sql);
       }
@@ -336,7 +347,6 @@ class DatabaseRepository {
   }
 
   Future<List> showPlaces({String? query}) async {
-    print('hajime');
     query = query ?? '';
     var database = await databaseProvider.db();
     if (query.length >= 1 || query == '') {
