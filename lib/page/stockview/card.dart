@@ -126,15 +126,25 @@ class _StockviewCardState extends State<StockviewCard> {
               // tileColor: Colors.white,
               title: Text(widget.data.namaBarang.toString()),
               subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Tempat beli: ${widget.data.tempatBeli}' +
-                      '\nTanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}' +
-                      '\nJumlah item : ${widget.data.pcs}pcs'),
-                  Expanded(
-                    child: Container(),
+                  Flexible(
+                    child: Text('Tempat beli: ${widget.data.tempatBeli}' +
+                        '\nTanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}' +
+                        '\nJumlah item : ${widget.data.pcs}pcs'),
                   ),
-                  Text('Harga jual : $hargaJual \nHarga beli : $hargaBeli' +
-                      '\nTotal beli : $totalBeli')
+                  // Expanded(
+                  //   child: Container(),
+                  // ),
+                  Flexible(
+                    // fit: FlexFit.tight,
+                    child: Text(
+                      'Harga jual : $hargaJual \nHarga beli : $hargaBeli' +
+                          '\nTotal beli : $totalBeli',
+                      // maxLines: 1,
+                      overflow: TextOverflow.fade,
+                    ),
+                  )
                 ],
               ),
             ),

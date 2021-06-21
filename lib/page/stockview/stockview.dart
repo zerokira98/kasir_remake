@@ -7,7 +7,7 @@ import 'package:kasir_remake/model/item_tr.dart';
 part 'card.dart';
 part 'filterbox.dart';
 
-final numFormat = new NumberFormat("#,##0.00", "en_US");
+final numFormat = new NumberFormat("#,##0", "en_US");
 
 class ListOfStockItems extends StatelessWidget {
   final ScrollController _scontrol = ScrollController();

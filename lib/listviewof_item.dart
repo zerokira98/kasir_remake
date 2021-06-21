@@ -38,10 +38,16 @@ class _ListOfItemsState extends State<ListOfItems> {
                   return ListTile(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  EditItemPage(data: snapshot.data![i])));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditItemPage(
+                            data: snapshot.data![i],
+                          ),
+                        ),
+                      ).then((value) {
+                        print(value);
+                        setState(() {});
+                      });
                     },
                     title: Text(snapshot.data![i]['NAMA']),
                     subtitle:
@@ -110,7 +116,7 @@ class _EditItemPageState extends State<EditItemPage>
               await RepositoryProvider.of<DatabaseRepository>(context)
                   .updateItem(data.productId, namec.text,
                       int.parse(hargaJual.text), barcode)
-                  .then((value) => Navigator.pop(context));
+                  .then((value) => Navigator.pop(context, 'halo minnasan XD'));
             },
             child: Text('Save'))
       ]),

@@ -4,6 +4,7 @@ import 'package:csv/csv.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:kasir_remake/bloc/stock_view/stockview_bloc.dart';
 import 'package:kasir_remake/listviewof_item.dart';
 import 'package:kasir_remake/msc/db.dart';
@@ -17,120 +18,132 @@ class DebugPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('misc'),
       ),
-      body: ListView(
+      body: GridView.builder(
         padding: EdgeInsets.all(8.0),
-
-        // crossAxisCount: 1,
-        // gridDelegate: ,
-        // mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          // AnimatedOpacity(
-          //   opacity: 0.5,
-          //   duration: Duration(milliseconds: 300),
-          //   curve: Curves.bounceIn,
-          //   child: ElevatedButton(
-          //     child: Text('transactions'),
-          //     onPressed: () {
-          //       RepositoryProvider.of<DatabaseRepository>(context)
-          //           .insideTrans();
-          //     },
-          //   ),
-          // ),
-          // ElevatedButton(
-          //   child: Text('press inside items'),
-          //   onPressed: () {
-          //     RepositoryProvider.of<DatabaseRepository>(context)
-          //         .showInsideItems();
-          //   },
-          // ),
-          // ElevatedButton(
-          //   child: Text('press inside add_stock'),
-          //   onPressed: () {
-          //     RepositoryProvider.of<DatabaseRepository>(context)
-          //         .showInsideStock(showName: true);
-          //   },
-          // ),
-          // ElevatedButton(
-          //   child: Text('close database'),
-          //   onPressed: () {
-          //     RepositoryProvider.of<DatabaseRepository>(context).closeDb();
-          //   },
-          // ),
-          // ElevatedButton(
-          //   child: Text('show tables'),
-          //   onPressed: () {
-          //     RepositoryProvider.of<DatabaseRepository>(context).showTables();
-          //   },
-          // ),
-          ElevatedButton(
-            child: Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Text('Test go list of items'),
+        itemCount: 3,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, mainAxisSpacing: 18, crossAxisSpacing: 18),
+        itemBuilder: (context, i) {
+          if (i == 0) {
+            return ElevatedButton(
+              child: Center(
+                // padding: const EdgeInsets.all(18.0),
+                child: Text('Stock History'),
+              ),
+              onPressed: () {
+                BlocProvider.of<StockviewBloc>(context).add(Initializeview());
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ListOfStockItems()));
+              },
+            );
+          }
+          if (i == 1) {
+            return ElevatedButton(
+              child: Center(
+                // padding: const EdgeInsets.all(18.0),
+                child: Text(
+                  'Print Monthly Stock',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return PrintAlert();
+                    });
+              },
+            );
+          }
+          return ElevatedButton(
+            child: Center(
+              // padding: const EdgeInsets.all(18.0),
+              child: Text('List of items'),
             ),
             onPressed: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ListOfItems()));
             },
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          ElevatedButton(
-            child: Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Text('Stock History'),
-            ),
-            onPressed: () {
-              BlocProvider.of<StockviewBloc>(context).add(Initializeview());
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ListOfStockItems()));
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-          ),
-          ElevatedButton(
-            child: Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Text('Print Monthly Stock'),
-            ),
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return PrintAlert();
-                  });
-            },
-          ),
-          ElevatedButton(
-            child: Text('Test terminal'),
-            onPressed: () async {
-              // Map a = {
-              //   'abc': {
-              //     'def': {'def1', 'def2', 'def3'},
-              //     'ghi': {'ghi1', 'ghi2'}
-              //   }
-              // };
-              // for (var b in a['abc'].values) {
-              //   print(b);
-              // }
-              // a['abc'].forEach((key, value) {
-              //   print('key :' + key);
-              //   print('value :' + value.toString());
-              // });
-              var wao =
-                  (await RepositoryProvider.of<DatabaseRepository>(context)
-                      .showInsideStock(page: 0, showName: true));
-              print(wao);
-              print(wao['maxEntry']);
-              // print(DateTime.now());
-              // Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //         builder: (context) => ListOfStockItems()));
-            },
-          ),
-        ],
+          );
+        },
+        // crossAxisCount: 1,
+        // gridDelegate: ,
+        // mainAxisAlignment: MainAxisAlignment.center,
+        // children: <Widget>[
+        // AnimatedOpacity(
+        //   opacity: 0.5,
+        //   duration: Duration(milliseconds: 300),
+        //   curve: Curves.bounceIn,
+        //   child: ElevatedButton(
+        //     child: Text('transactions'),
+        //     onPressed: () {
+        //       RepositoryProvider.of<DatabaseRepository>(context)
+        //           .insideTrans();
+        //     },
+        //   ),
+        // ),
+        // ElevatedButton(
+        //   child: Text('press inside items'),
+        //   onPressed: () {
+        //     RepositoryProvider.of<DatabaseRepository>(context)
+        //         .showInsideItems();
+        //   },
+        // ),
+        // ElevatedButton(
+        //   child: Text('press inside add_stock'),
+        //   onPressed: () {
+        //     RepositoryProvider.of<DatabaseRepository>(context)
+        //         .showInsideStock(showName: true);
+        //   },
+        // ),
+        // ElevatedButton(
+        //   child: Text('close database'),
+        //   onPressed: () {
+        //     RepositoryProvider.of<DatabaseRepository>(context).closeDb();
+        //   },
+        // ),
+        // ElevatedButton(
+        //   child: Text('show tables'),
+        //   onPressed: () {
+        //     RepositoryProvider.of<DatabaseRepository>(context).showTables();
+        //   },
+        // ),
+
+        // Padding(
+        //   padding: EdgeInsets.all(8.0),
+        // ),
+
+        // ElevatedButton(
+        //   child: Text('Test terminal'),
+        //   onPressed: () async {
+        //     // Map a = {
+        //     //   'abc': {
+        //     //     'def': {'def1', 'def2', 'def3'},
+        //     //     'ghi': {'ghi1', 'ghi2'}
+        //     //   }
+        //     // };
+        //     // for (var b in a['abc'].values) {
+        //     //   print(b);
+        //     // }
+        //     // a['abc'].forEach((key, value) {
+        //     //   print('key :' + key);
+        //     //   print('value :' + value.toString());
+        //     // });
+        //     var wao =
+        //         (await RepositoryProvider.of<DatabaseRepository>(context)
+        //             .showInsideStock(page: 0, showName: true));
+        //     print(wao);
+        //     print(wao['maxEntry']);
+        //     // print(DateTime.now());
+        //     // Navigator.push(
+        //     //     context,
+        //     //     MaterialPageRoute(
+        //     //         builder: (context) => ListOfStockItems()));
+        //   },
+        // ),
+        // ],
       ),
     );
   }
@@ -142,7 +155,7 @@ class PrintAlert extends StatefulWidget {
 }
 
 class _PrintAlertState extends State<PrintAlert> {
-  List data = [
+  List dataBulan = [
     'Januari',
     'Februari',
     'Maret',
@@ -184,7 +197,7 @@ class _PrintAlertState extends State<PrintAlert> {
                   items: [
                     for (int i = 0; i < 12; i++)
                       DropdownMenuItem(
-                        child: Text(data[i].toString()),
+                        child: Text(dataBulan[i].toString()),
                         value: i,
                         // onTap: () {},
                       ),
@@ -193,6 +206,10 @@ class _PrintAlertState extends State<PrintAlert> {
                 ),
               ),
             ],
+          ),
+          Text(
+            'file saved at: /storage/emulated/0/Android/data/com.soloprojecc.kasir_remake',
+            textScaleFactor: 0.7,
           ),
           // CupertinoDatePicker(onDateTimeChanged: (val){},,)
         ],
@@ -221,25 +238,67 @@ class _PrintAlertState extends State<PrintAlert> {
                                   .day
                                   .toString())
                           .toString());
-              print(data);
-              print(a!.path);
+              // print(data);
+              // print(a!.path);
               if (data['res'].isNotEmpty) {
-                File theFile = File(a.path + '/backup.csv');
+                File theFile =
+                    File(a!.path + '/backup_${dataBulan[multivalue]}.csv');
                 double totalkeluar = 0.0;
-                var datalist = (data['res'] as List)
-                    .map<List>((e) => [
-                          e['ADD_DATE'],
-                          // ?.toString().substring(0, 10),
-                          e['NAMA'],
-                          e['PRICE'],
-                          e['QTY'],
-                          e['SUPPLIER']
-                        ])
-                    .toList();
+                List<List> datalist = [
+                  // ['...']
+                ];
+                //  (data['res'] as List)
+                //     .map<List>((e) => [
+                //           e['ADD_DATE'].toString().substring(0, 10),
+                //           e['NAMA'],
+                //           e['PRICE'],
+                //           e['QTY'],
+                //           e['SUPPLIER']
+                //         ])
+                //     .toList();
+                var e = data['res'];
+                for (var i = 0; i < data['res'].length; i++) {
+                  if (i == 0) {
+                    var x = DateTime.parse(
+                        e[i]['ADD_DATE'].toString().substring(0, 10));
+                    var y = DateFormat('EEEE').format(x);
+                    print('y=$y');
+
+                    datalist.add([
+                      y + ', ' + e[i]['ADD_DATE'].toString().substring(0, 10),
+                    ]);
+                    print('here');
+                  } else if (i != 0 &&
+                      e[i]['ADD_DATE'].toString().substring(0, 10) !=
+                          e[i - 1]['ADD_DATE'].toString().substring(0, 10)) {
+                    var x = DateTime.parse(
+                        e[i]['ADD_DATE'].toString().substring(0, 10));
+                    var y = DateFormat('EEEE').format(x);
+                    datalist.add([
+                      y + ', ' + e[i]['ADD_DATE'].toString().substring(0, 10),
+                    ]);
+                  }
+                  datalist.addAll({
+                    [
+                      e[i]['ADD_DATE'].toString().substring(0, 10),
+                      e[i]['NAMA'],
+                      e[i]['PRICE'],
+                      e[i]['QTY'],
+                      e[i]['SUPPLIER']
+                    ]
+                  });
+                }
+                // datalist.insert(0, [
+                //   data['res'][0]['ADD_DATE'].toString().substring(0, 10),
+                // ]);
                 for (var item in datalist) {
-                  totalkeluar += item[2] * item[3];
+                  if (item.length > 2) {
+                    totalkeluar += item[2] * item[3];
+                  }
                 }
                 datalist[0]
+                  ..add('')
+                  ..add('')
                   ..add('')
                   ..add('Total bulan ini : ')
                   ..add(totalkeluar);
